@@ -35,8 +35,6 @@ dir_path = os.path.dirname(file_path)
 sys.path.append(dir_path)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-sys.path.append("C:/Users/benja/source/repos/robustregression/out/build/x64-release")
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import pyRobustRegressionLib as rrl
 
 
