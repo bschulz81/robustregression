@@ -8,7 +8,9 @@ and published in 	arXiv:2201.12466 [astro-ph.IM], https://doi.org/10.1093/mnras/
 In addition to these, two other robust algorithms were added and the curve fitting library has been brought into a form of a
 clear and simply API that can be easily used for very broad and general applications.
 
-The library offers python bindings for most functions. So the programmer has the choice between c++ and python.
+The library offers python bindings for most functions. So the programmer has the choice between c++ and python. In order to 
+compile the library with python bindings Pybind11 and Python3 should be installed and be found by CMake. 
+Otherwise, only the C++ standard template library is used, together with OpenMP. 
 
 The documentation of the functions that the library uses are written in the header files.
 
