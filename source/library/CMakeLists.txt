@@ -1,4 +1,3 @@
-option(WITH_PYTHON "set this to generate python bindings" ON)
 
 include(GenerateExportHeader)
 
