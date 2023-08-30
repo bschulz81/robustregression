@@ -7,7 +7,7 @@ set(sources  ${CMAKE_CURRENT_SOURCE_DIR}/src/linearregression.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/statisticfunctions.cpp 
              ${CMAKE_CURRENT_SOURCE_DIR}/src/nonlinearregression.cpp)
 
-ADD_LIBRARY(RobustRegressionLib SHARED ${sources} "include/lossfunctions.h")
+ADD_LIBRARY(RobustRegressionLib SHARED ${sources})
 
 target_include_directories(RobustRegressionLib PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include" ${CMAKE_CURRENT_BINARY_DIR})
 
