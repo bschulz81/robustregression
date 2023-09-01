@@ -75,12 +75,23 @@ int main(int argc, char* argv[])
 
 	Matrixcode::printvector(Matrixcode::Gaussian_algorithm(m, v));
 
+		printf("\nDefine some array ");
+	valarray<double>X0 = { 3, 13, 7, 5, 21, 23, 39, 23, 40, 23, 14, 12, 56, 23 };
+	Matrixcode::printvector(Vector(X0));
 
+	printf("\n compute the median ");
+	printf("%f",Statisticfunctions::median(X0));
+
+	printf("\n compute Q1 ");
+	printf("%f", Statisticfunctions::Q1(X0));
+
+	printf("\n compute Q3 ");
+	printf("%f", Statisticfunctions::Q3(X0));
 
 	valarray<double> X = { -3, 5,7, 10,13,16,20,22 };
 	valarray<double> Y = { -210, 430, 590,830,1070,1310,1630,1790 };
 
-	printf("Set the data on the X axis to: ");
+	printf("\n\n\nSet the data on the X axis to: ");
 	Matrixcode::printvector(Vector(X));
 	printf("Set the data on the Y axis to: ");
 	Matrixcode::printvector(Vector(Y));
@@ -129,7 +140,6 @@ int main(int argc, char* argv[])
 	Robust_Regression::modified_lts_control_linear ctrl;
 	Robust_Regression::linear_algorithm_result res5;
 
-
 	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res5);
 	printf("\n\n\nRobust regression with the same 2 inserted outliers\n");
 	printf("\nModified last trimmed squares\n");
@@ -145,6 +155,32 @@ int main(int argc, char* argv[])
 		printf("%lu", (unsigned long)w);
 		printf(", ");
 	}
+
+	Robust_Regression::modified_lts_control_linear ctrla;
+	Robust_Regression::linear_algorithm_result res5a;
+
+
+	ctrla.rejection_method = Robust_Regression::tolerance_is_interquartile_range;
+	ctrla.outlier_tolerance = 1.5;
+	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrla, res5a);
+	printf("\n\nRobust regression with the same 2 dataset but instead of the default S estimator, now the interquartile range method\n");
+	printf("\nModified last trimmed squares\n");
+	printf(" Slope ");
+	printf("%f", res5a.main_slope);
+	printf("\n Intercept ");
+	printf("%f", res5a.main_intercept);
+	printf("\n Indices of outliers ");
+
+	for (size_t i = 0; i < res5a.indices_of_removedpoints.size(); i++)
+	{
+		size_t w = res5a.indices_of_removedpoints[i];
+		printf("%lu", (unsigned long)w);
+		printf(", ");
+	}
+
+
+
+
 	printf("\n\nIterative outlier removal\n");
 
 
