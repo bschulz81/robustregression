@@ -1,4 +1,4 @@
-"""
+""
 
 Copyright(c) < 2023 > <Benjamin Schulz>
 
@@ -72,7 +72,7 @@ Xa.Printvector()
 Ya.Printvector()
 
 
-print("\nCompute the standarddeviation of the first array")
+print("\nCompute the Standard deviation of the first array")
 print(rrl.StatisticFunctions.stdeviation(X,8))
 
 m0=rrl.MatrixCode.Identity(3,3)
@@ -83,32 +83,37 @@ print("\nAddition operator for 2 unit matrices")
 
 m2.Printmatrix()
 
+print("Define a Matrix elementwise")
+m3=rrl.MatrixCode.Matrix(3,3)
+m3[0, 0] = 1
+m3[0, 1] = 2
+m3[0, 2] = -1
 
-m=rrl.MatrixCode.Matrix(3,3)
-m[0, 0] = 1
-m[0, 1] = 2
-m[0, 2] = -1
+m3[1, 0] = 1
+m3[1, 1] = 1
+m3[1, 2] = -1
+m3[2, 0] = 2
+m3[2, 1] = -1
+m3[2, 2] = 1
 
-m[1, 0] = 1
-m[1, 1] = 1
-m[1, 2] = -1
-m[2, 0] = 2
-m[2, 1] = -1
-m[2, 2] = 1
+m3.Printmatrix();
 
-v=rrl.MatrixCode.Vector (3)
-v[0] = 2
-v[1] = 0
-v[2] = 3
+print("another way to initialize the matrix m in a single line")
+m4=rrl.MatrixCode.Matrix(3,3,[1,2,-1,1,1,-1,2,-1,1])
+m4.Printmatrix()
 
+v=rrl.MatrixCode.Vector ([2,0,3])
+
+print("print a vector v with a command")
 v.Printvector()
 
 
-print("\nGaussian algorithm")
-res=rrl.MatrixCode.Gaussian_algorithm(m, v)
+print("\nGaussian algorithm M*res=v")
+res=rrl.MatrixCode.Gaussian_algorithm(m3, v)
 
+print("print the elements of the vector elementwise, maybe floating point conversion effects occur.")
 for item in range(0,3):
-    print(item)
+    print(res[item])
 
 
 print("\nLinear Regression of X and Y")
@@ -253,4 +258,3 @@ print(res8.beta[1])
 print("\nOutlier indices")
 for ind in res8.indices_of_removedpoints:
     print(ind)
-
