@@ -351,9 +351,6 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q1(valarray<double> m)
 {
 	size_t s = m.size();
 	std::sort(std::begin(m), std::end(m));
-	// Index of median of entire data
-
-// Index of median of entire data
 	double Q1;
 	if (s < 4)
 	{
@@ -386,9 +383,6 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q3(valarray<double> m)
 {
 	size_t s = m.size();
 	std::sort(std::begin(m), std::end(m));
-	// Index of median of entire data
-
-// Index of median of entire data
 	double Q3;
 	if (s < 4)
 	{
@@ -402,7 +396,7 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q3(valarray<double> m)
 		}
 		else
 		{
-			Q3 = 2.0 * m[0];
+			Q3 = m[0];
 		}
 	}
 	else
