@@ -69,6 +69,7 @@ namespace Robust_Regression
 		tolerance_is_decision_in_T_ESTIMATION,
 		use_peirce_criterion,
 		tolerance_is_biweight_midvariance,
+		tolerance_is_interquartile_range
 	};
 
 	//defines the controlparameters common in all the robust regression algorithms
