@@ -1,5 +1,4 @@
-""
-
+"""
 Copyright(c) < 2023 > <Benjamin Schulz>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,7 +18,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 """
 
 ## Test application. Demonstrates the usage of the library in Python.
@@ -60,24 +58,32 @@ def Jacobi(X, beta):
 print(" 5!= ")
 print(rrl.StatisticFunctions.factorial(5))
 
-print("\nDefine some arrays")
-X=[-3.0,5.0,7.0,10.0,13.0,16.0,20.0,22.0]
-Y=[-210.0,430.0,590.0,830.0,1070.0,1310.0,1630.0,1790.0]
 
-print("\nLoad the arrays into a vector and print them")
-Xa=rrl.MatrixCode.Vector(X)
-Ya=rrl.MatrixCode.Vector(Y)
+print("\nDefine some array and print it")
+X0=[3, 13, 7, 5, 21, 23, 39, 23, 40, 23, 14, 12, 56, 23]
 
-Xa.Printvector()
-Ya.Printvector()
+rrl.MatrixCode.Vector(X0).Printvector()
+
+print("compute the median")
+print(rrl.StatisticFunctions.median(X0))
+print("Compute Q1")
+print(rrl.StatisticFunctions.Q1(X0))
+print("Compute Q3")
+print(rrl.StatisticFunctions.Q3(X0))
+print("\nCompute the Standard deviation of the array")
+print(rrl.StatisticFunctions.stdeviation(X0))
 
 
-print("\nCompute the Standard deviation of the first array")
-print(rrl.StatisticFunctions.stdeviation(X,8))
+
+
+
+
 
 m0=rrl.MatrixCode.Identity(3,3)
 m1=rrl.MatrixCode.Identity(3,3)
 m2=m0+m1
+
+
 
 print("\nAddition operator for 2 unit matrices")
 
@@ -116,11 +122,19 @@ for item in range(0,3):
     print(res[item])
 
 
-print("\nLinear Regression of X and Y")
-print("X")
+print("\nDefine some arrays X and Y")
+X=[-3.0,5.0,7.0,10.0,13.0,16.0,20.0,22.0]
+Y=[-210.0,430.0,590.0,830.0,1070.0,1310.0,1630.0,1790.0]
+
+print("\nLoad the arrays into a vector and print them")
+Xa=rrl.MatrixCode.Vector(X)
+Ya=rrl.MatrixCode.Vector(Y)
+
 Xa.Printvector()
-print("Y")
 Ya.Printvector()
+
+
+print("\nLinear Regression of X and Y")
 
 res1=rrl.LinearRegression.result()
 rrl.LinearRegression.linear_regression(X, Y, res1)
@@ -178,6 +192,26 @@ print(res4.main_intercept)
 print("\nOutlier indices")
 for ind in res4.indices_of_removedpoints:
     print(ind)
+
+
+print("\n\nModified lts algorithm, but now instead of the default S estimator with the interquartile range method")
+ctrl4a= rrl.RobustRegression.modified_lts_control_linear()
+ctrl4a.outlier_tolerance=1.5;
+ctrl4a.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_interquartile_range;
+res4a= rrl.RobustRegression.linear_algorithm_result()
+rrl.RobustRegression.modified_lts_regression_linear(X2, Y2, ctrl4a, res4a)
+
+print("Slope") 
+print(res4a.main_slope)
+print("Intercept") 
+print(res4a.main_intercept)
+
+print("\nOutlier indices")
+for ind in res4.indices_of_removedpoints:
+    print(ind)
+
+
+
 
 
 
@@ -258,3 +292,4 @@ print(res8.beta[1])
 print("\nOutlier indices")
 for ind in res8.indices_of_removedpoints:
     print(ind)
+
