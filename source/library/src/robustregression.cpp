@@ -1,4 +1,3 @@
-
 /*
 
 Copyright(c) < 2023 > <Benjamin Schulz>
@@ -76,7 +75,7 @@ typedef bool(*nonlinreg)(const valarray<double>& X, const valarray<double>& Y, N
 
 inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_method, double tolerance, double average_or_median, double estimators);
 
-inline void computeavgestimator(valarray<double>& err, size_t pointnumber, double& est, double& avg, Robust_Regression::estimator_name estimator_name);
+inline void computew1w2estimator(valarray<double>& err, size_t pointnumber, double& est1, double& est2, Robust_Regression::estimator_name estimator_name);
 
 inline void helperfunction_findmodel(valarray<double>& err, valarray<bool>* usedpoint,  Robust_Regression::control& ctrl);
 
@@ -112,7 +111,7 @@ inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y
 
 
 
-inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_method, double tolerance , double average_or_median , double estimators)
+inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_method, double tolerance , double w1, double w2 )
 {
 	switch (rejection_method)
 	{
@@ -128,15 +127,21 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 	case Robust_Regression::use_peirce_criterion:
 	{
 		double G = err * err;
-		if (G > average_or_median * tolerance)
+		if (G > w1 * tolerance)
 		{
 			return true;
 		}
 		break;
 	}
+	case::Robust_Regression::tolerance_is_interquartile_range:
+	{
+		bool b =err < (w1 - tolerance * (w2 - w1)) ?  true : err > (w2 + tolerance * (w2 - w1)) ? true : false;
+		return b;
+		break;
+	}
 	default:
 	{
-		double G = Statisticfunctions::fabs((err - average_or_median) / estimators);
+		double G = Statisticfunctions::fabs((err - w1) / w2);
 		if (G > tolerance)
 		{
 			return true;
@@ -148,7 +153,7 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 }
 
 
-inline void computeavgestimator(valarray<double>& err, size_t pointnumber,double & est,double& avg, Robust_Regression::estimator_name estimator_name)
+inline void computew1w2estimator(valarray<double>& err, size_t pointnumber,double & w1,double& w2, Robust_Regression::estimator_name estimator_name)
 {
 	switch (estimator_name)
 	{
@@ -164,43 +169,46 @@ inline void computeavgestimator(valarray<double>& err, size_t pointnumber,double
 	case Robust_Regression::tolerance_is_significance_in_Grubbs_test:
 	{
 		//falls through and computes stdev and average
-		est = Statisticfunctions::stdeviation(err, pointnumber); 
+		w2 = Statisticfunctions::stdeviation(err); 
 	}
 	case Robust_Regression::use_peirce_criterion:
 	{
-		avg = Statisticfunctions::average(err, pointnumber);
+		w1 = Statisticfunctions::average(err);
 		break;
 	}
 	case Robust_Regression::tolerance_is_decision_in_MAD_ESTIMATION:
 	{
-		avg = Statisticfunctions::median(err, pointnumber);
-		est = Statisticfunctions::MAD_estimator(err, avg, pointnumber);
+		w1 = Statisticfunctions::median(err);
+		w2 = Statisticfunctions::MAD_estimator(err, w1);
 		break;
 	}
 	case Robust_Regression::tolerance_is_biweight_midvariance:
 	{
-		avg = Statisticfunctions::median(err, pointnumber);
-		est = Statisticfunctions::onestepbiweightmidvariance(err, avg, pointnumber);
+		w1 = Statisticfunctions::median(err);
+		w2 = Statisticfunctions::onestepbiweightmidvariance(err, w1);
 		break;
 	}
 	case Robust_Regression::tolerance_is_decision_in_Q_ESTIMATION:
 	{
-		avg = Statisticfunctions::median(err, pointnumber);
-		est = Statisticfunctions::Q_estimator(err, pointnumber);
+		w1 = Statisticfunctions::median(err);
+		w2 = Statisticfunctions::Q_estimator(err);
 		break;
 	}
 	case Robust_Regression::tolerance_is_decision_in_S_ESTIMATION:
 	{
-		avg = Statisticfunctions::median(err, pointnumber);
-		est = Statisticfunctions::S_estimator(err, pointnumber);
+		w1 = Statisticfunctions::median(err);
+		w2 = Statisticfunctions::S_estimator(err);
 		break;
 	}
 	case Robust_Regression::tolerance_is_decision_in_T_ESTIMATION:
 	{
-		avg = Statisticfunctions::median(err, pointnumber);
-		est = Statisticfunctions::T_estimator(err, pointnumber);
+		w1 = Statisticfunctions::median(err);
+		w2 = Statisticfunctions::T_estimator(err );
 		break;
 	}
+	case::Robust_Regression::tolerance_is_interquartile_range:
+		w1 = Statisticfunctions::Q1(err);
+		w2 = Statisticfunctions::Q3(err);
 	}
 }
 
@@ -224,13 +232,13 @@ inline void helperfunction_findmodel(valarray<double>&err, valarray<bool>* usedp
 
 	if (mp.size() > 0)
 	{
-		double estimate = 0, average_or_median = 0;
-		computeavgestimator(err, pointnumber, estimate, average_or_median, ctrl.rejection_method);
+		double estimate1 = 0, estimate2 = 0;
+		computew1w2estimator(err, pointnumber, estimate1, estimate2, ctrl.rejection_method);
 
 		for (size_t j = 0; j < mp.size(); j++)
 		{
 
-			if (isoutlier(mp[j].error, ctrl.rejection_method, ctrl.outlier_tolerance, average_or_median, estimate))
+			if (isoutlier(mp[j].error, ctrl.rejection_method, ctrl.outlier_tolerance, estimate1,estimate2 ))
 				(*usedpoint)[mp[j].point] = false;
 			else
 				(*usedpoint)[mp[j].point] = true;
@@ -886,13 +894,13 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 		if (counter > controldata.stop_after_numberofiterations_without_improvement)
 			break;
 
-		double estimate = 0, average_or_median = 0;
+		double estimate1 = 0, estimate2 = 0;
 
-		computeavgestimator(res.errorarray, res.errorarray.size(), estimate, average_or_median, controldata.rejection_method);
+		computew1w2estimator(res.errorarray, res.errorarray.size(), estimate1, estimate2, controldata.rejection_method);
 
 		for (size_t i = 0; i < res.errorarray.size(); i++)
 		{
-			if ((isoutlier(res.errorarray[i], controldata.rejection_method, controldata.outlier_tolerance, average_or_median, estimate)) && indices[i] == true)
+			if ((isoutlier(res.errorarray[i], controldata.rejection_method, controldata.outlier_tolerance, estimate1, estimate2)) && indices[i] == true)
 				indices[i] = false;
 		}
 
@@ -1135,11 +1143,11 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 
 
 
-		double estimate = 0, average_or_median = 0;
-		computeavgestimator(res.errorarray, res.errorarray.size(), estimate, average_or_median, ctrl.rejection_method);
+		double estimate1 = 0, estimate2 = 0;
+		computew1w2estimator(res.errorarray, res.errorarray.size(), estimate1, estimate2, ctrl.rejection_method);
 		for (size_t i = 0; i < res.errorarray.size(); i++)
 		{
-			if ((isoutlier(res.errorarray[i], ctrl.rejection_method, ctrl.outlier_tolerance, average_or_median, estimate)) && (indices[i] == true))
+			if ((isoutlier(res.errorarray[i], ctrl.rejection_method, ctrl.outlier_tolerance, estimate1, estimate2)) && (indices[i] == true))
 				indices[i] = false;	
 		}
 
