@@ -101,15 +101,15 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::median_linear_regression(co
 				q++;
 			}
 		}
-		stacks2[i] = Statisticfunctions::median(stacks1, q);
+		stacks2[i] = Statisticfunctions::median(stacks1);
 	}
 
-	double thisslope = Statisticfunctions::median(stacks2, usedpoints);
+	double thisslope = Statisticfunctions::median(stacks2);
 	for (size_t n = 0; n < usedpoints; n++)
 	{
 		stacki1[n] =y[n] - thisslope * x[n];
 	}
-	double thisintercept = Statisticfunctions::median(stacki1, usedpoints);
+	double thisintercept = Statisticfunctions::median(stacki1);
 	res.main_intercept = thisintercept;
 	res.main_slope = thisslope;
 	return true;
