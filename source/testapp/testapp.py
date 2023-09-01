@@ -250,6 +250,26 @@ print("Intercept")
 print(res6.beta[1])
 
 
+print("\n\n\nSimple Nonlinear Regression with the modified dataset with outliers")
+
+res6a=rrl.NonLinearRegression.result() 
+ctrl6a=rrl.NonLinearRegression.control()
+
+init6a=rrl.NonLinearRegression.initdata() 
+init6a.Jacobian=Jacobi
+init6a.f=linear
+init6a.initialguess = [1,1]
+
+
+rrl.NonLinearRegression.non_linear_regression(X2, Y2, init6a, ctrl6a, res6a)
+
+print("Slope") 
+print(res6a.beta[0])
+print("Intercept") 
+print(res6a.beta[1])
+
+
+
 print("\n\n\nRobust non-linear regression with the same 2 inserted outliers\n")
 
 print("\nIterative outlier removal \n")
