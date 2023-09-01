@@ -21,17 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
-
-
-
-
-
-
-
-
-
-
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -61,9 +50,6 @@ double H(double y, size_t nu);
 ROBUSTREGRESSION_API inline  double Statisticfunctions::fabs(double f){
 	return (f < 0) ? -f : f;
 }
-inline float Statisticfunctions::fabs(float f) {
-	return (f < 0) ? -f : f;
-}
 
 	inline  double  Statisticfunctions::factorial(size_t n)
 	{
@@ -74,9 +60,9 @@ inline float Statisticfunctions::fabs(float f) {
 	}
 
 
-	ROBUSTREGRESSION_API inline  double  Statisticfunctions::stdeviation(valarray<double>& errs, size_t s)
+	ROBUSTREGRESSION_API inline  double  Statisticfunctions::stdeviation(valarray<double>& errs)
 	{
-
+		size_t s = errs.size();
 		double sum = 0, devi = 0, t = 0;
 		for (size_t i = 0; i < s; i++)
 		{
@@ -95,8 +81,9 @@ inline float Statisticfunctions::fabs(float f) {
 	}
 
 
-	ROBUSTREGRESSION_API inline  double  Statisticfunctions::average(valarray<double>& errs, size_t s)
+	ROBUSTREGRESSION_API inline  double  Statisticfunctions::average(valarray<double>& errs)
 	{
+		size_t s = errs.size();
 		double sum = 0, devi = 0, t = 0;
 		for (size_t i = 0; i < s; i++)
 		{
@@ -106,63 +93,44 @@ inline float Statisticfunctions::fabs(float f) {
 	}
 
 
-	 ROBUSTREGRESSION_API inline  double  Statisticfunctions::median(valarray<double> arr, size_t n)
+	 ROBUSTREGRESSION_API inline  double  Statisticfunctions::median(valarray<double> arr)
 	{
-		size_t nhalf = n / 2;
-
-#if (__cplusplus == 201703L) && !defined(MACOSX)
-		nth_element(std::execution::par, std::begin(arr), std::begin(arr) + nhalf, std::begin(arr) + n);
-#else
-		nth_element(std::begin(*arr), std::begin(*arr) + nhalf, std::begin(*arr) + n);
-#endif
-
-
-		double  med = (arr)[nhalf];
-		if (n % 2 == 0)
+		 size_t n = arr.size();
+		 if (n == 1)
+			 return arr[0];
+		else
 		{
-#if __cplusplus == 201703L && !defined(MACOSX)
-			auto max_it = max_element(std::execution::par, std::begin(arr), std::begin(arr) + nhalf);
-#else
-			auto max_it = max_element(std::begin(*arr), std::begin(*arr) + nhalf);
-#endif
+			size_t nhalf = n / 2;
 
-			med = (*max_it + med) / 2.0;
-		}
-		return med;
-	}
-	inline ROBUSTREGRESSION_API double  Statisticfunctions::median(valarray<float> arr, size_t n)
-	{
-		size_t nhalf = n / 2;
+			if (n % 2 != 0)
+			{
 #if (__cplusplus == 201703L) && !defined(MACOSX)
-		nth_element(std::execution::par, std::begin(arr), std::begin(arr) + nhalf, std::begin(arr) + n);
+				nth_element(std::execution::par, std::begin(arr), std::begin(arr) + nhalf, std::begin(arr) + n);
 #else
-		nth_element(std::begin(*arr), std::begin(*arr) + nhalf, std::begin(*arr) + n);
+				nth_element(std::begin(arr), std::begin(arr) + nhalf, std::begin(arr) + n);
 #endif
-
-
-		float  med = (arr)[nhalf];
-		if (n % 2 == 0)
-		{
-#if __cplusplus == 201703L && !defined(MACOSX)
-			auto max_it = max_element(std::execution::par, std::begin(arr), std::begin(arr) + nhalf);
-#else
-			auto max_it = max_element(std::begin(*arr), std::begin(*arr) + nhalf);
-#endif
-
-			med = (*max_it + med) / 2.0f;
+				return  (arr)[nhalf];
+			}
+			else
+			{
+				std::sort(std::begin(arr), std::end(arr));
+				return (arr[(size_t)((n - 1) / 2)] + arr[(size_t)(nhalf)]) / 2;
+			}
 		}
-		return med;
+
 	}
 
 
-	inline double  Statisticfunctions::lowmedian(valarray<double> arr, size_t n)
+
+	inline double  Statisticfunctions::lowmedian(valarray<double> arr)
 	{
+		size_t n = arr.size();
 		size_t m = (size_t)(floor(((double)n + 1.0) / 2.0) - 1.0);
 
 #if __cplusplus == 201703L && !defined(MACOSX)
 		nth_element(std::execution::par, std::begin(arr), std::begin(arr) + m, std::begin(arr) + n);
 #else
-		nth_element(std::begin(*arr), std::begin(arr) + m, std::begin(arr) + n);
+		nth_element(std::begin(arr), std::begin(arr) + m, std::begin(arr) + n);
 #endif
 		return (double)(arr)[m];
 	}
@@ -266,8 +234,9 @@ inline float Statisticfunctions::fabs(float f) {
 	}
 
 
-	ROBUSTREGRESSION_API inline  double  Statisticfunctions::Q_estimator(valarray<double>& err, size_t s)
+	ROBUSTREGRESSION_API inline  double  Statisticfunctions::Q_estimator(valarray<double>& err)
 	{
+		size_t s = err.size();
 		valarray<double> t1(binomial(s, 2));
 
 		
@@ -315,9 +284,9 @@ inline float Statisticfunctions::fabs(float f) {
 
 
 
-	ROBUSTREGRESSION_API inline   double    Statisticfunctions::S_estimator(valarray<double>& err, size_t s)
+	ROBUSTREGRESSION_API inline   double    Statisticfunctions::S_estimator(valarray<double>& err)
 	{
-
+		size_t s = err.size();
 		size_t sminus = s - 1;
 
 		valarray<double>t1(sminus);
@@ -334,7 +303,7 @@ inline float Statisticfunctions::fabs(float f) {
 					q++;
 				}
 			}
-			m1[i] = (lowmedian(t1, sminus));
+			m1[i] = (lowmedian(t1));
 		}
 		double c = 1;
 		double cn[] = { 0,0, 0.743, 1.851, 0.954 ,1.351, 0.993, 1.198 ,1.005, 1.131 };
@@ -350,12 +319,13 @@ inline float Statisticfunctions::fabs(float f) {
 			}
 		}
 
-		return (c * 1.1926 * lowmedian(m1, s));
+		return (c * 1.1926 * lowmedian(m1));
 	}
 
 
-	ROBUSTREGRESSION_API inline   double    Statisticfunctions::MAD_estimator(valarray<double>& err,double& m, size_t s)
+	ROBUSTREGRESSION_API inline   double    Statisticfunctions::MAD_estimator(valarray<double>& err,double& m)
 	{
+		size_t s = err.size();
 		valarray<double>m1(s);
 		for (size_t i = 0; i < s; i++)
 		{
@@ -372,13 +342,88 @@ inline float Statisticfunctions::fabs(float f) {
 			c = s / (s - 0.8);
 		}
 
-		return  c * 1.4826 * median(m1, s);
+		return  c * 1.4826 * median(m1);
 	}
 
 
-	ROBUSTREGRESSION_API inline  double   Statisticfunctions::onestepbiweightmidvariance(valarray<double>& err,double &m, size_t s)
+
+	ROBUSTREGRESSION_API inline double  Statisticfunctions::Q1(valarray<double> m)
 	{
-		double mad = MAD_estimator(err,m, s);
+		size_t s = m.size();
+		std::sort(std::begin(m),std::end(m));
+		// Index of median of entire data
+
+	// Index of median of entire data
+		double Q1;
+		if (s < 4)
+		{
+			if (s == 3)
+			{
+				Q1 = m[0];
+			}
+			else if (s == 2)
+			{
+				Q1 = m[0];
+
+			}
+			else
+			{
+				Q1 = m[0];
+			}
+		}
+		else
+		{
+			float test1 = s * 0.25;
+			if (test1 == (size_t)(test1))
+				Q1 = (m[(size_t)test1 - 1] + m[(size_t)test1]) / 2.0;
+			else
+				Q1 = m[((size_t)(test1))];
+		}
+		return (Q1);
+	}
+
+	ROBUSTREGRESSION_API inline double  Statisticfunctions::Q3(valarray<double> m)
+	{
+		size_t s = m.size();
+		std::sort(std::begin(m), std::end(m));
+		// Index of median of entire data
+
+	// Index of median of entire data
+		double Q3;
+		if (s < 4)
+		{
+			if (s == 3)
+			{
+				Q3 = m[2];
+			}
+			else if (s == 2)
+			{
+				Q3 = m[1];
+			}
+			else
+			{
+				Q3 = 2.0 * m[0];
+			}
+		}
+		else
+		{
+
+			float test2 = s * 0.75;
+			if (test2 == (size_t)(test2))
+				Q3 = (m[(size_t)test2 - 1] + m[(size_t)test2]) / 2.0;
+			else
+				Q3 = m[((size_t)(test2))];
+		}
+		return Q3;
+	}
+
+
+
+	ROBUSTREGRESSION_API inline  double   Statisticfunctions::onestepbiweightmidvariance(valarray<double>& err,double &m)
+	{
+		size_t s = err.size();
+
+		double mad = MAD_estimator(err,m);
 		double p1 = 0.0, p2 = 0.0;
 		for (size_t i = 0; i < s; i++)
 		{
@@ -398,8 +443,9 @@ inline float Statisticfunctions::fabs(float f) {
 	}
 
 
-	ROBUSTREGRESSION_API inline  double  Statisticfunctions::T_estimator(valarray<double>& err, size_t s)
+	ROBUSTREGRESSION_API inline  double  Statisticfunctions::T_estimator(valarray<double>& err)
 	{
+		size_t s = err.size();
 		valarray<double>med1(s);
 		
 		valarray<double>arr(s - 1);
@@ -416,7 +462,7 @@ inline float Statisticfunctions::fabs(float f) {
 						q++;
 					}
 				}
-				med1[i] = (median(arr, s - 1));
+				med1[i] = (median(arr));
 			}
 
 		size_t h = s / 2 + 1;
