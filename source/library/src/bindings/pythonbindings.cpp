@@ -44,8 +44,6 @@ using namespace std;
 PYBIND11_MODULE(pyRobustRegressionLib, m) {
 
 	py::module Statisticfunctions = m.def_submodule("StatisticFunctions");
-    float (*d1)(float) = &Statisticfunctions::fabs;
-    double (*d2)(double) = &Statisticfunctions::fabs;
 	Statisticfunctions.def("factorial", &Statisticfunctions::factorial);
 	Statisticfunctions.def("stdeviation", &Statisticfunctions::stdeviation);
 	Statisticfunctions.def("average", &Statisticfunctions::average);
@@ -59,21 +57,17 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 	Statisticfunctions.def("MAD_estimator", &Statisticfunctions::MAD_estimator);
 	Statisticfunctions.def("T_estimator", &Statisticfunctions::T_estimator);
 	Statisticfunctions.def("onestepbiweightmidvariance", &Statisticfunctions::onestepbiweightmidvariance);
-	Statisticfunctions.def("fabs", d2);
-	Statisticfunctions.def("fabs", d1);
-    double (*d3)(valarray<double>arr, size_t n) = &Statisticfunctions::median;
-    double (*d4)(valarray<float>arr, size_t n) = &Statisticfunctions::median;
-	Statisticfunctions.def("median", d3);
-	Statisticfunctions.def("median", d4);
-
-
+	Statisticfunctions.def("fabs", &Statisticfunctions::fabs);
+	Statisticfunctions.def("median", &Statisticfunctions::median);
+	Statisticfunctions.def("Q1", &Statisticfunctions::Q1);
+	Statisticfunctions.def("Q3", &Statisticfunctions::Q3);
 	py::module linearregression = m.def_submodule("LinearRegression");
 
-    py::class_<Linear_Regression::result>(linearregression, "result")
+	py::class_<Linear_Regression::result>(linearregression, "result")
 		.def(py::init<>())
-        .def_readwrite("main_slope", &Linear_Regression::result::main_slope)
-        .def_readwrite("main_intercept", &Linear_Regression::result::main_intercept);
-        ;
+		.def_readwrite("main_slope", &Linear_Regression::result::main_slope)
+		.def_readwrite("main_intercept", &Linear_Regression::result::main_intercept);
+	;
 	linearregression.def("median_linear_regression", &Linear_Regression::median_linear_regression);
 	linearregression.def("linear_regression", &Linear_Regression::linear_regression);
 
@@ -82,7 +76,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 	py::class_<Vector>(matrixcode, "Vector")
 		.def(py::init< valarray<double>>())
 		.def(py::init< const  size_t >())
-		.def("size", &Vector::Size )
+		.def("size", &Vector::Size)
 		.def("resize", &Vector::Resize)
 		.def("__setitem__", [](Vector& self, size_t index, double val)
 			{ self(index) = val; })
@@ -94,66 +88,64 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 		.def(py::self * py::self)
 		.def(py::self / double())
 		.def("Printvector", [](Vector& self) {
-				std::ostringstream os;
-				for (size_t j = 0; j < self.Size(); j++)
-				{
-					os << self(j);
-					os << " ";
-				}
-				std::string str(os.str());
-				py::print(str);
-				py::print("\n");
+		std::ostringstream os;
+		for (size_t j = 0; j < self.Size(); j++)
+		{
+			os << self(j);
+			os << " ";
+		}
+		std::string str(os.str());
+		py::print(str);
+		py::print("\n");
 			})
 		;
 
-	py::class_<Matrix>(matrixcode, "Matrix")
-		.def(py::init<const size_t, const  size_t, valarray<double>>())
-		.def(py::init<const size_t, const size_t>())
-		.def("Rows", &Matrix::Rows)
-		.def("Columns", &Matrix::Columns)
-		.def("SwapRows", &Matrix::SwapRows)
-		.def("resize", &Matrix::Resize)
+			py::class_<Matrix>(matrixcode, "Matrix")
+				.def(py::init<const size_t, const  size_t, valarray<double>>())
+				.def(py::init<const size_t, const size_t>())
+				.def("Rows", &Matrix::Rows)
+				.def("Columns", &Matrix::Columns)
+				.def("SwapRows", &Matrix::SwapRows)
+				.def("resize", &Matrix::Resize)
 
-		.def("__setitem__", [ ](Matrix& self, vector<size_t> v, double val)
-			{ self(v[0], v[1]) = val; })
-		.def("__getitem__", [](Matrix& self, vector<size_t> v)
-			{ return self(v[0], v[1]);
-})
-		.def(py::self + py::self)
-		.def(py::self - py::self)
-		.def(py::self * double())
-		.def(py::self * py::self)
-		.def("__mul__", [](const Matrix& a, Vector& b) {
-		return a * b;
-			}, py::is_operator())
+				.def("__setitem__", [](Matrix& self, vector<size_t> v, double val)
+					{ self(v[0], v[1]) = val; })
+				.def("__getitem__", [](Matrix& self, vector<size_t> v)
+					{ return self(v[0], v[1]);
+					})
+				.def(py::self + py::self)
+						.def(py::self - py::self)
+						.def(py::self * double())
+						.def(py::self * py::self)
+						.def("__mul__", [](const Matrix& a, Vector& b) {
+						return a * b;
+							}, py::is_operator())
 
-		.def("__mul__", [](const Matrix& a, valarray<double>& b) {
-				return a * b;
-			}, py::is_operator())
+						.def("__mul__", [](const Matrix& a, valarray<double>& b) {
+								return a * b;
+							}, py::is_operator())
 
-		.def("Printmatrix",[](Matrix& self) {
-				for (long i = 0; i < self.Rows(); i++)
-				{
-					std::ostringstream os;
-					for (size_t j = 0; j < self.Columns(); j++)
-					{
-						os << self(i, j);
-						os << " ";
-					}
-					std::string str(os.str());
-					py::print(str);
-				}
-				py::print("\n ");
-			})
-		;
+								.def("Printmatrix", [](Matrix& self) {
+								for (long i = 0; i < self.Rows(); i++)
+								{
+									std::ostringstream os;
+									for (size_t j = 0; j < self.Columns(); j++)
+									{
+										os << self(i, j);
+										os << " ";
+									}
+									std::string str(os.str());
+									py::print(str);
+								}
+								py::print("\n ");
+									})
+								;
 
-		matrixcode.def("Identity", &Matrixcode::Identity);
-		matrixcode.def("Transpose", &Matrixcode::Transpose);
-		matrixcode.def("Diagonal", &Matrixcode::Diagonal);
-		matrixcode.def("Gaussian_algorithm", static_cast<Vector(*)(const Matrix&,const Vector&)>(&Matrixcode::Gaussian_algorithm));
-		matrixcode.def("Gaussian_algorithm", static_cast<valarray<double>(*)(const Matrix &,const valarray<double>&)>(&Matrixcode::Gaussian_algorithm));
-
-
+									matrixcode.def("Identity", &Matrixcode::Identity);
+									matrixcode.def("Transpose", &Matrixcode::Transpose);
+									matrixcode.def("Diagonal", &Matrixcode::Diagonal);
+									matrixcode.def("Gaussian_algorithm", static_cast<Vector(*)(const Matrix&, const Vector&)>(&Matrixcode::Gaussian_algorithm));
+									matrixcode.def("Gaussian_algorithm", static_cast<valarray<double>(*)(const Matrix&, const valarray<double>&)>(&Matrixcode::Gaussian_algorithm));
 
 	py::module nonlinearregression = m.def_submodule("NonLinearRegression");
 
@@ -230,6 +222,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 		.value("tolerance_is_decision_in_T_ESTIMATION", Robust_Regression::estimator_name::tolerance_is_decision_in_T_ESTIMATION)
 		.value("use_peirce_criterion", Robust_Regression::estimator_name::use_peirce_criterion)
 		.value("tolerance_is_biweight_midvariance", Robust_Regression::estimator_name::tolerance_is_biweight_midvariance)
+		.value("tolerance_is_interquartile_range", Robust_Regression::estimator_name::tolerance_is_interquartile_range)
 		.export_values()
 		;
 
