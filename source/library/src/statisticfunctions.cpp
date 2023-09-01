@@ -503,3 +503,4 @@ inline double  H(double y, size_t nu)
 		sum += factorial((size_t)j) * factorial(size_t(j - 1.0)) / (pow(4, -((double)j)) * factorial((size_t)2.0 * j)) * pow((1 + y * y / nu), -((double)j));
 	}
 	return y / (2 * sqrt((double)nu)) * sum;
+}
