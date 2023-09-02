@@ -286,40 +286,126 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::Q_estimator(valarray<do
 
 ROBUSTREGRESSION_API inline   double    Statisticfunctions::S_estimator(valarray<double>& err)
 {
-	size_t s = err.size();
-	size_t sminus = s - 1;
+	
+    size_t n = x.size();
+    std::valarray<double> a2(n); 
 
-	valarray<double>t1(sminus);
-	valarray<double>m1(s);
+    std::sort(std::begin(x), std::begin(x) + n);
 
-	for (size_t i = 0; i < s; i++)
+	a2[0] = x[n / 2] - x[0];
+	a2[n - 1] = x[n - 1] - x[(n + 1) / 2 - 1];
+    
+
+
+	for (size_t i = 1; i < (n + 1) / 2; i++)
 	{
-		size_t q = 0;
-		for (size_t k = 0; k < s; k++)
+		size_t leftB, rightB,
+			nB = n - i - 1,
+			diff2 = (nB - i) / 2,
+			Amin = diff2,
+			Amax = diff2 + i,
+			leftA = leftB = 1,
+			rightA = rightB = nB;
+		while (leftA < rightA)
 		{
-			if (i != k)
+			size_t l = rightA - leftA,
+				half = l / 2,
+				even = l % 2,
+				tryA = leftA + half,
+				tryB = leftB + half;
+			if (tryA > Amin)
 			{
-				t1[q] = (Statisticfunctions::fabs((err)[i] - (err)[k]));
-				q++;
+				if (tryA > Amax)
+				{
+					rightA = tryA;
+					leftB = tryB + even;
+				}
+				else
+				{
+					if (x[i] - x[i - tryA + Amin] < x[tryB + i] - x[i])
+					{
+						rightB = tryB;
+						leftA = tryA + even;
+					}
+					else
+					{
+						rightA = tryA;
+						leftB = tryB + even;
+					}
+				}
+			}
+			else
+			{
+				rightB = tryB;
+				leftA = tryA + even;
 			}
 		}
-		m1[i] = (lowmedian(t1));
-	}
-	double c = 1;
-	double cn[] = { 0,0, 0.743, 1.851, 0.954 ,1.351, 0.993, 1.198 ,1.005, 1.131 };
-	if (s <= 9)
-	{
-		c = cn[s];
-	}
-	else
-	{
-		if (s % 2 != 0)
-		{
-			c = s / (s - 0.9);
-		}
+		if (leftA > Amax)
+			a2[i] = x[leftB + i] - x[i];
+		else
+			a2[i] = std::min(x[i] - x[i - leftA + Amin], x[leftB + i] - x[i]);
 	}
 
-	return (c * 1.1926 * lowmedian(m1));
+	for (size_t i = (n + 1) / 2; i < n - 1; i++)
+	{
+		size_t leftB,rightB, nA = n - i - 1,
+			diff2 = (i - nA) / 2,
+			leftA = leftB=1,
+			rightA = rightB= i,
+			Amin = diff2 + 1,
+			Amax = diff2 + nA;
+		while (leftA < rightA)
+		{
+			size_t l = rightA - leftA,
+				half = l / 2,
+				even = l % 2,
+				tryA = leftA + half,
+				tryB = leftB + half;
+			if (tryA < Amin)
+			{
+				rightB = tryB;
+				leftA = tryA + even;
+			}
+			else
+			{
+				if (tryA > Amax)
+				{
+					rightA = tryA;
+					leftB = tryB + even;
+				}
+				else
+				{
+					if (x[i + tryA - Amin + 1] - x[i] < x[i] - x[i - tryB])
+					{
+						rightB = tryB;
+						leftA = tryA + even;
+					}
+					else
+					{
+						rightA = tryA;
+						leftB = tryB + even;
+					}
+				}
+			}
+		}
+		if (leftA > Amax)
+			a2[i] = x[i] - x[i - leftB];
+		else
+			a2[i] = std::min(x[i + leftA - Amin + 1] - x[i], x[i] - x[i - leftB]);
+	}
+
+	double cn = 1.0;
+     if (n <= 9) 
+    {
+        double mynum[10] = {0,0, 0.743, 1.851, 0.954,1.351, 0.993, 1.198 ,1.005, 1.131 };
+        cn = mynum[n];
+    }
+    else {
+        if (n % 2 == 1) 
+            cn = n / (n - 0.9);
+    }
+
+   return cn * 1.1926 * lowmedian(a2);
 }
 
 
