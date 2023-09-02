@@ -439,7 +439,7 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q1(valarray<double> m)
 #if (__cplusplus == 201703L) && !defined(MACOSX)
 	std::sort(std::execution::par,std::begin(m), std::end(m));
 #else
-	std::sort(std::execution::par, std::begin(m), std::end(m));
+	std::sort(std::begin(m), std::end(m));
 #endif
 	double Q1;
 	if (s < 4)
@@ -475,7 +475,7 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q3(valarray<double> m)
 #if (__cplusplus == 201703L) && !defined(MACOSX)
 	std::sort(std::execution::par,std::begin(m), std::end(m));
 #else
-	std::sort(std::execution::par, std::begin(m), std::end(m));
+	std::sort(std::begin(m), std::end(m));
 #endif
 	double Q3;
 	if (s < 4)
