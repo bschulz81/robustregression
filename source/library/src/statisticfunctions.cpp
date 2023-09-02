@@ -286,7 +286,7 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::Q_estimator(valarray<do
 
 ROBUSTREGRESSION_API inline   double    Statisticfunctions::S_estimator(valarray<double>& err)
 {
-	
+    valarray<double> x(err);
     size_t n = x.size();
     std::valarray<double> a2(n); 
 
