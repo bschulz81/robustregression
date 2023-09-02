@@ -49,6 +49,6 @@ Some references are:
 9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.) The version of the S estimator in this library now is adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C.
 
 # Compiling and Installing the library:
-The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard (per default, it uses C17, but with a swithch in the CMakeLists.txt for the library, it can use C14. 
-It also makes use of OpenMP and needs Python in version 3 and pybind 11 to compile. After compilation with CMake, an out folder appears where the compiled test applications and a python test script can be found which demonstrate how to use the library.
+The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard (per default, it uses C17, but with a switch in the CMakeLists.txt for the library, it can use C14. 
+It also makes use of OpenMP and needs Python in version 3 and pybind 11 to compile. After compilation with CMake, an /out folder appears where the library and the compiled test applications and a python test script can be found which demonstrate how to use the library.
 
