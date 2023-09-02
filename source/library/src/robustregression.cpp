@@ -398,9 +398,9 @@ void helperfunction_last_trimmed2(const valarray<double>& x, const valarray<doub
 	for (long i = 0; i < arr.size(); i++)
 	{
 		if (controldata_lin != NULL)
-			findmodel_linear(x, y, &arr[i], regr, est, *controldata_lin);
+			findmodel_linear(x, y, &arr[i], regr, *controldata_lin);
 		else
-			findmodel_non_linear(x, y, &arr[i], nonlinreg, est, *init_nonlin, *controldata_nonlin);
+			findmodel_non_linear(x, y, &arr[i], nonlinreg,*init_nonlin, *controldata_nonlin);
 		//for each model we tried to find increase counter1 by 1
 #pragma omp atomic
 		counter1++;
