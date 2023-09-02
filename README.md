@@ -21,7 +21,7 @@ The Library is released under MIT License.
 Apart from his own publication, the author has not found the main robust curve fitting algorithms from this library in the statistical literature.
 
 One of the algorithms presented here is a modification of the forward search algorithms by  Hadi and Simonoff, Atkinson and Riani and the least trimmed squares
-method of Rousseeuw. The modifucation of the author is to use various estimators to include data after the algorithm tried a random initial combination.
+method of Rousseeuw. The modification of the author is to use various estimators to include data after the algorithm tried a random initial combination.
 
 The algorithm was originally developed for physical problems, where one has outliers but also data, which is often subject to random fluctuations, like astronomical seeing.
 As we observed during trials with the astronomy application, including the S estimator in the forward search removes large outliers but allows for small random fluctuations 
@@ -48,4 +48,7 @@ Some references are:
 8. Hadi and Simonoff, J. Amer. Statist. Assoc. 88 (1993) 1264-1272, Atkinson and Riani,Robust Diagnostic Regression Analysis (2000), Springer, for the forward search
 9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.) The version of the S estimator in this library now is adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C.
 
+#Installing:
+The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard (per default, it uses C17, but with a swithch in the CMakeLists.txt for the library, it can use C14. 
+It also makes use of OpenMP and needs Python in version 3 and pybind 11 to compile. After compilation with CMake, an out folder appears where the compiled test applications and a python test script can be found which demonstrate how to use the library.
 
