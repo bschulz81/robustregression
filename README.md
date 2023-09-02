@@ -46,9 +46,6 @@ Some references are:
 7. Rousseeuw, P. J. (1984).Journal of the American Statistical Association. 79 (388): 871–880. doi:10.1080/01621459.1984.10477105. JSTOR 2288718.
    Rousseeuw, P. J.; Leroy, A. M. (2005) [1987]. Robust Regression and Outlier Detection. Wiley. doi:10.1002/0471725382. ISBN 978-0-471-85233-9, for the least trimmed squares algorithm
 8. Hadi and Simonoff, J. Amer. Statist. Assoc. 88 (1993) 1264-1272, Atkinson and Riani,Robust Diagnostic Regression Analysis (2000), Springer, for the forward search
-
-At the time of this writing, the library currently contains still a naive implementation of the S and Q estimators and not the fast versions published by Rousseeuw and Croux, because the fortran code in their publication may be under copyright. Hence, the naive and slow version of the S and Q estimator algorithm was implemented.
-
-
+9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.) The version of the S estimator in this library now is adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C.
 
 
