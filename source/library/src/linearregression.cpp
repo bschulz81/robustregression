@@ -24,7 +24,7 @@ SOFTWARE.
 #include <vector>
 #include <valarray>
 #include <omp.h>
-
+#include <algorithm>
 #include "lossfunctions.h"
 #include "linearregression.h"
 #include "statisticfunctions.h"
@@ -47,6 +47,7 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::linear_regression(const val
 
 
 	double sumy = 0;
+#pragma omp simd
 	for (size_t n = 0; n < usedpoints; n++)
 	{
 		sumy += y[n];
@@ -56,6 +57,8 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::linear_regression(const val
 
 
 	double sumx = 0, sumxy = 0, sumxx = 0;
+
+#pragma omp simd
 	for (size_t n = 0; n < usedpoints; n++)
 	{
 		sumx += x[n];
@@ -85,8 +88,6 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::median_linear_regression(co
 	valarray<double> stacks2(usedpoints);
 	valarray<double> stacks1(usedpoints - 1);
 
-	size_t halfsize = usedpoints / 2;
-
 	valarray<double> stacki1(usedpoints);
 	
 	for (size_t i = 0; i < usedpoints; i++)
@@ -110,6 +111,7 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::median_linear_regression(co
 		stacki1[n] =y[n] - thisslope * x[n];
 	}
 	double thisintercept = Statisticfunctions::median(stacki1);
+
 	res.main_intercept = thisintercept;
 	res.main_slope = thisslope;
 	return true;
