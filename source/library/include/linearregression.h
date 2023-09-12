@@ -45,7 +45,7 @@ namespace Linear_Regression
 	// computes a linear regression. datapoints are two valarrays x and y. the result is put into res.
 	ROBUSTREGRESSION_API bool linear_regression(const valarray<double>& x, const valarray<double>& y, Linear_Regression::result& res);
 
-	// computes a medial linear regression, which is more robust against outliers. Parameters are similar as in the linear regression.
+	// computes a median linear regression, which is more robust against outliers. Parameters are similar as in the linear regression.
 	// It is slower than linear regression and for large and many outliers, it also does not yield precise results.
 	ROBUSTREGRESSION_API bool median_linear_regression(const valarray<double>&x,const  valarray<double>&y, Linear_Regression::result&res);
 }
