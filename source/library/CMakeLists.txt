@@ -33,7 +33,7 @@ if(MSVC)
     set_property(TARGET RobustRegressionLib PROPERTY CXX_STANDARD 17)
     set_property(TARGET RobustRegressionLib PROPERTY CXX_STANDARD_REQUIRED ON)
     target_compile_options(RobustRegressionLib PUBLIC "/Zc:__cplusplus")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXXFLAGS} /std:c++17 /EHsc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXXFLAGS} /std:c++17 /EHsc /openmp:experimental")
 endif()
 
 
@@ -78,9 +78,10 @@ if(${WITH_PYTHON})
         set_property(TARGET pyRobustRegressionLib PROPERTY CXX_STANDARD 17)
         set_property(TARGET pyRobustRegressionLib PROPERTY CXX_STANDARD_REQUIRED ON)
         target_compile_options(pyRobustRegressionLib PUBLIC "/Zc:__cplusplus")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXXFLAGS} /std:c++17 /EHsc")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXXFLAGS} /std:c++17 /EHsc /openmp:experimental")
     endif()
 
-    target_link_libraries(pyRobustRegressionLib PUBLIC RobustRegressionLib)
+   target_link_libraries(pyRobustRegressionLib PUBLIC RobustRegressionLib)
 
+ 
 endif()
