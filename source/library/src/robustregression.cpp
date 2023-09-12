@@ -714,10 +714,6 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 		}
 
 	}
-	else if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
-	{
-		controldata.outlier_tolerance = Statisticfunctions::peirce(x.size(), controldata.maximum_number_of_outliers, 2);
-	}
 	if (controldata.outlier_tolerance == 0)
 	{
 		controldata.maximum_number_of_outliers = 0;
@@ -735,8 +731,10 @@ inline bool checkdata_linearmethods(const valarray<double>& x, const valarray<do
 		if (controldata.huberslossfunction_border < 0)
 			return false;
 	if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
+	{
 		controldata.lossfunction = LossFunctions::squaredresidual;
-
+		controldata.outlier_tolerance = Statisticfunctions::peirce(x.size(), controldata.maximum_number_of_outliers, 2);
+	}
 	return true;
 }
 
@@ -767,7 +765,10 @@ inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray
 		if (controldata.huberslossfunction_border < 0)
 			return false;
 	if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
+	{
 		controldata.lossfunction = LossFunctions::squaredresidual;
+		controldata.outlier_tolerance = Statisticfunctions::peirce(x.size(), controldata.maximum_number_of_outliers, init.initialguess.size());
+	}
 
 	return true;
 }
