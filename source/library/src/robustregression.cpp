@@ -32,13 +32,14 @@ SOFTWARE.
 #include <complex>
 #include <omp.h>
 #include <chrono>
-
+#include <type_traits>
 #include "statisticfunctions.h"
 #include "lossfunctions.h"
 #include "linearregression.h"
 
 #include "robustregression.h"
 
+using signed_size_t = std::make_signed_t<std::size_t>;
 using namespace std;
 
 #if __cplusplus == 201703L
@@ -87,21 +88,19 @@ inline bool findmodel_non_linear(const valarray<double>& x, const valarray<doubl
 	nonlinreg regr, Non_Linear_Regression::initdata& init, Robust_Regression::nonlinear_algorithm_control& ctrl);
 
 
-inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarray<double>& y, valarray<bool>* indices, valarray<bool>* indices2,
-	linreg regr,
+inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarray<double>& y, valarray<bool>* indices, valarray<bool>* indices2, linreg regr,
 	Robust_Regression::linear_algorithm_result* result_lin,
-	Robust_Regression::linear_algorithm_control* controldata_lin,
+	Robust_Regression::modified_lts_control_linear* controldata_lin,
 	nonlinreg nonlinreg,
 	Non_Linear_Regression::initdata* init_nonlin,
-	Robust_Regression::nonlinear_algorithm_control* controldata_nonlin,
-	Robust_Regression::nonlinear_algorithm_result* result_nonlin
-);
+	Robust_Regression::modified_lts_control_nonlinear* controldata_nonlin,
+	Robust_Regression::nonlinear_algorithm_result* result_nonlin);
 
 
 inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<double>& y,
 	Robust_Regression::control& controldata);
 
-inline bool checkdata_nonlinear_methods(const valarray<double>& x, const valarray<double>& y,
+inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray<double>& y,
 	Robust_Regression::nonlinear_algorithm_control& controldata, Non_Linear_Regression::initdata& init);
 
 inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y, valarray<bool>& indices,
@@ -115,7 +114,7 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 {
 	switch (rejection_method)
 	{
-	case Robust_Regression::tolerance_is_maximum_squared_error:
+	case Robust_Regression::tolerance_is_maximum_error:
 	{
 		double G = err * err;
 		if (G > Statisticfunctions::fabs(tolerance))
@@ -126,7 +125,7 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 	}
 	case Robust_Regression::use_peirce_criterion:
 	{
-		double G = err * err;
+		double G = err ;
 		if (G > w1 * tolerance)
 		{
 			return true;
@@ -141,7 +140,7 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 	}
 	default:
 	{
-		double G = Statisticfunctions::fabs((err - w1) / w2);
+		double G = Statisticfunctions::fabs(err - w1) / w2;
 		if (G > tolerance)
 		{
 			return true;
@@ -157,7 +156,7 @@ inline void computew1w2estimator(valarray<double>& err, size_t pointnumber,doubl
 {
 	switch (estimator_name)
 	{
-	case Robust_Regression::tolerance_is_maximum_squared_error:
+	case Robust_Regression::tolerance_is_maximum_error:
 	{
 		break;
 	}
@@ -249,7 +248,7 @@ inline void helperfunction_findmodel(valarray<double>&err, valarray<bool>* usedp
 
 
 inline void findmodel_linear(const valarray<double>& x, const valarray<double>& y, valarray<bool>* usedpoint,
-	linreg regr,  Robust_Regression::control&ctrl)
+	linreg regr,  Robust_Regression::linear_algorithm_control&ctrl)
 {
 
 	size_t pointnumber = x.size();
@@ -395,7 +394,7 @@ void helperfunction_last_trimmed2(const valarray<double>& x, const valarray<doub
 		});
 #else
 #pragma omp parallel for
-	for (long i = 0; i < arr.size(); i++)
+	for (signed_size_t i = 0; i < arr.size(); i++)
 	{
 		if (controldata_lin != NULL)
 			findmodel_linear(x, y, &arr[i], regr, *controldata_lin);
@@ -416,7 +415,7 @@ void helperfunction_last_trimmed2(const valarray<double>& x, const valarray<doub
 	}
 
 #pragma omp parallel for
-	for (long i = 0; i < arr2.size(); i++)
+	for (signed_size_t i = 0; i < arr2.size(); i++)
 	{
 		valarray<double> xnew = x[arr2[i]];
 		valarray<double> ynew = y[arr2[i]];
@@ -562,24 +561,13 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 		result_lin->main_error = DBL_MAX;
 		useransac = controldata_lin->use_ransac;
 		workload_in__several_threads = controldata_lin->workload_distributed_to_several_threads;
-		if (controldata_lin->stop_after_numberofiterations_without_improvement < workload_in__several_threads)
-			controldata_lin->stop_after_numberofiterations_without_improvement = workload_in__several_threads;
-
-		
 	}
 	else
 	{
-
 		result_nonlin->main_error = DBL_MAX;
 		workload_in__several_threads = controldata_nonlin->workload_distributed_to_several_threads;
 		useransac = controldata_nonlin->use_ransac;
-		if (controldata_nonlin->stop_after_numberofiterations_without_improvement < workload_in__several_threads)
-			controldata_nonlin->stop_after_numberofiterations_without_improvement = workload_in__several_threads;
-
-
 	}
-
-	
 
 	if ((numbercomp <= workload_in__several_threads) && (useransac == false))
 	{
@@ -693,7 +681,6 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 
 	size_t pointnumber = x.size();
 
-
 	if (controldata.rejection_method == Robust_Regression::no_rejection)
 	{
 		controldata.maximum_number_of_outliers = 0;
@@ -708,7 +695,6 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 	}
 
 	size_t minimummodelsize = pointnumber - controldata.maximum_number_of_outliers;
-	//ensure, we fit at least 4 points
 	if (minimummodelsize < 4)
 	{
 		minimummodelsize = 4;
@@ -722,11 +708,16 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 			controldata.rejection_method = Robust_Regression::no_rejection;
 			controldata.maximum_number_of_outliers = 0;
 		}
+		else
+		{
+			controldata.outlier_tolerance = Statisticfunctions::crit(controldata.outlier_tolerance, x.size());
+		}
+
 	}
-
-	if (controldata.huberslossfunction_border <= 0)
-		controldata.lossfunction = LossFunctions::squaredresidual;
-
+	else if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
+	{
+		controldata.outlier_tolerance = Statisticfunctions::peirce(x.size(), controldata.maximum_number_of_outliers, 2);
+	}
 	if (controldata.outlier_tolerance == 0)
 	{
 		controldata.maximum_number_of_outliers = 0;
@@ -735,10 +726,24 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 	return true;
 }
 
-inline bool checkdata_nonlinear_methods(const valarray<double>& x, const valarray<double>& y,
-	Robust_Regression::nonlinear_algorithm_control& controldata, Non_Linear_Regression::initdata& init)
+inline bool checkdata_linearmethods(const valarray<double>& x, const valarray<double>& y,
+	Robust_Regression::linear_algorithm_control& controldata)
 {
-	if (checkdata_robustmethods(x, y, controldata) == false)
+	if (!checkdata_robustmethods(x, y, controldata))
+		return false;
+	if (controldata.lossfunction == LossFunctions::huberlossfunction)
+		if (controldata.huberslossfunction_border < 0)
+			return false;
+	if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
+		controldata.lossfunction = LossFunctions::squaredresidual;
+
+	return true;
+}
+
+inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray<double>& y,
+	Robust_Regression::nonlinear_algorithm_control& controldata, Non_Linear_Regression::initdata & init)
+{
+	if (!checkdata_robustmethods(x, y, controldata))
 		return false;
 	if (init.f == NULL)
 		return false;
@@ -753,13 +758,20 @@ inline bool checkdata_nonlinear_methods(const valarray<double>& x, const valarra
 	if (controldata.h < 0)
 		controldata.h = 0.01;
 	if (controldata.stop_nonlinear_curve_fitting_after_iterations < 0)
-		controldata.stop_nonlinear_curve_fitting_after_iterations = 1;
+		controldata.stop_nonlinear_curve_fitting_after_iterations = 10;
 	if (controldata.stop_nonlinear_curve_fitting_after_seconds < 0)
-		controldata.stop_nonlinear_curve_fitting_after_seconds = 1;
+		controldata.stop_nonlinear_curve_fitting_after_seconds = 2;
 	if (controldata.tolerable_error < DBL_EPSILON)
 		controldata.tolerable_error = DBL_EPSILON;
+	if (controldata.lossfunction == LossFunctions::huberlossfunction)
+		if (controldata.huberslossfunction_border < 0)
+			return false;
+	if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
+		controldata.lossfunction = LossFunctions::squaredresidual;
+
 	return true;
 }
+
 
 
 inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y, valarray<bool>& indices,
@@ -789,7 +801,7 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 	Robust_Regression::linear_algorithm_control& controldata, Robust_Regression::linear_algorithm_result& result)
 {
 
-	if (!checkdata_robustmethods(x, y, controldata))
+	if (!checkdata_linearmethods(x, y, controldata))
 		return false;
 
 	size_t pointnumber = x.size();
@@ -811,24 +823,6 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 		linear_loss_function(x, y, controldata,result);
 		fill_robustdata(x, y, indices, result, controldata);
 		return true;
-	}
-
-	if (controldata.rejection_method == Robust_Regression::tolerance_is_significance_in_Grubbs_test)
-	{
-		if (controldata.outlier_tolerance >= 1.0)
-		{
-			if (controldata.use_median_regression)
-			{
-				Linear_Regression::median_linear_regression(x, y, result);
-			}
-			else
-			{
-				Linear_Regression::linear_regression(x, y, result);
-			}
-			linear_loss_function(x, y,controldata,result);
-			fill_robustdata(x, y, indices, result, controldata);
-			return true;
-		}
 	}
 
 
@@ -931,7 +925,7 @@ ROBUSTREGRESSION_API inline bool  Robust_Regression::modified_lts_regression_lin
 
 
 	size_t pointnumber = x.size();
-	if (!checkdata_robustmethods(x, y, controldata))
+	if (!checkdata_linearmethods(x, y, controldata))
 		return false;
 
 	if (controldata.tolerable_error < DBL_EPSILON)
@@ -996,7 +990,7 @@ ROBUSTREGRESSION_API inline bool Robust_Regression::modified_lts_regression_nonl
 {
 	
 	size_t pointnumber = x.size();
-	if (!checkdata_nonlinear_methods(x, y,controldata,init))
+	if (!checkdata_nonlinearmethods(x, y,controldata,init))
 		return false;
 
 	valarray<bool> indices(pointnumber);
@@ -1045,7 +1039,7 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 	Robust_Regression::nonlinear_algorithm_result& result)
 {
 	
-	if (!checkdata_nonlinear_methods(x, y, ctrl, init))
+	if (!checkdata_nonlinearmethods(x, y, ctrl, init))
 		return false;
 
 	size_t pointnumber = x.size();
@@ -1062,23 +1056,6 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 		else
 			return false;
 	}
-
-
-	if (ctrl.rejection_method == Robust_Regression::tolerance_is_significance_in_Grubbs_test)
-	{
-		if (ctrl.outlier_tolerance >= 1.0)
-		{
-			if (Non_Linear_Regression::non_linear_regression(x, y, init, ctrl, result))
-			{
-				Non_Linear_Regression::nonlinear_loss_function(init.f, x, result.beta, y, ctrl, result);
-				fill_robustdata(x, y, indices, result, ctrl);
-				return true;
-			}
-			else
-				return false;
-		}
-	}
-
 
 
 	valarray<double>xv(pointnumber);
