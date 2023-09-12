@@ -1,33 +1,3 @@
-/*
-
-Copyright(c) < 2023 > <Benjamin Schulz>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files(the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and /or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions :
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-
-
-
-#pragma once
-#include <valarray>
-#include <functional>
-#include "matrixcode.h"
 #include "lossfunctions.h"
 #include "robustregressionlib_exports.h"
 
@@ -112,13 +82,13 @@ namespace  Non_Linear_Regression
 	// but you can also stop the algorithm after some number of iterations or some seconds.
 
 
-	//computes the non linear regression from given arrays X,Y, initdata with a function to be fit and a jacobian, given controldata and yields the result
+	//Computes the non linear regression from given arrays X,Y, initdata with a function to be fit and a jacobian, given controldata and yields the result
 	ROBUSTREGRESSION_API bool non_linear_regression(const valarray<double>& X, const valarray<double>& Y,
 		initdata& init,
 		control& control,
 		result& res);
 
-	//computes the loss function given the  loss function given the function f(X,beta), the arrays for X and beta, the data Y and the error metric.
+	//Computes the loss function given the  loss function given the function f(X,beta), the arrays for X and beta, the data Y and the error metric.
 	//the output is stored in res
 	ROBUSTREGRESSION_API double nonlinear_loss_function(fun f, const valarray<double>& X, valarray<double>& beta, const valarray<double>& Y,
 		Non_Linear_Regression::control& ctrl,
