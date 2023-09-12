@@ -59,25 +59,56 @@ namespace Robust_Regression
 	//one has a tolerance parameter which can be used to set a measure of what an outlier is with respect to a statistical estimator
 	enum estimator_name
 	{
-		no_rejection,
-		tolerance_is_maximum_squared_error,
-		tolerance_multiplies_standard_deviation_of_error,
-		tolerance_is_significance_in_Grubbs_test,
-		tolerance_is_decision_in_MAD_ESTIMATION,
-		tolerance_is_decision_in_S_ESTIMATION,
-		tolerance_is_decision_in_Q_ESTIMATION,
-		tolerance_is_decision_in_T_ESTIMATION,
-		use_peirce_criterion,
-		tolerance_is_biweight_midvariance,
-		tolerance_is_interquartile_range
+		no_rejection, //no rejection takes place
+		tolerance_is_maximum_error, //The tolerance parameter sets the maximally tolerable errorof a point,
+	    //where error is computed by some metric,i.e. the absolute value of the residuals, the squared residuals
+		// or Huber's loss function. Choosing this estimator is not recommended since it is not robust.
+
+		tolerance_multiplies_standard_deviation_of_error,//a point with an error is an outlier
+		//if |error-average(errors)|>tolerance*standard_deviation(errors). The errors
+		//are computed by some metric, i.e. the absolute value of the residuals, the squared residuals or Huber's loss function.
+		//It is not recommended to use this estimator since it is not robust
+
+		tolerance_is_significance_in_Grubbs_test, // A point is
+		// an outlier if it its error is determined as such by the Grubbs test, given the distribution of the errors,
+		// with a significance defined the tolerance parameter. The errors are computed by some metric, 
+		// i.e. the absolute value of the residuals, the squared residuals or Huber's loss function.
+
+		tolerance_is_decision_in_MAD_ESTIMATION,// A point with an error is an outlier if |error-median(errors)|/MAD(errors)>tolerance
+		// The errors are computed by some metrici.e. the absolute value of the residuals, the squared residuals or Huber's loss function.
+		// This estimator is robust and recommended.
+
+		tolerance_is_decision_in_S_ESTIMATION,// A point with an error is an outlier if |error-median(errors)|/S_estimator(errors)>tolerance
+		// The errors are computed by some metrici.e. the absolute value of the residuals, the squared residuals or Huber's loss function.
+		//  This estimator is robust and recommended.
+
+		tolerance_is_decision_in_Q_ESTIMATION,// A point with an error is an outlier if |error-median(errors)|/Q_estimator(errors)>tolerance
+		// The errors are computed by some metrici.e. the absolute value of the residuals, the squared residuals or Huber's loss function.
+		//  This estimator is robust and recommended.
+
+		tolerance_is_decision_in_T_ESTIMATION,// A point with an error is an outlier if |error-median(errors)|/T_estimator(errors)>tolerance
+		// The errors are computed by some metrici.e. the absolute value of the residuals, the squared residuals or Huber's loss function.
+		//  This estimator is robust and recommended.
+
+		use_peirce_criterion,// If set, the Peirce criterion is used on the array of errors to establish whether a point with an error is
+		//an outlier. The errors are computed by some metric, i.e. the absolute value of the residuals, the squared residuals or
+		//  Huber's loss function.
+
+		tolerance_is_biweight_midvariance,// A point with an error is an outlier if
+		//|error-median(errors)|/Biweight_midvariance(errors)>tolerance. The errors are computed by some metrici.e. the absolute value
+		//  of the residuals, the squared residuals or Huber's loss function.
+		tolerance_is_interquartile_range // A point is an outlier its error is smaller than Q1-tolerance*Inter_Quartile_Range
+		//or larger than Q2+tolerance*Inter_Quartile_Range The errors are computed by some metrici.e.the absolute value of the 
+		// residuals, the squared residuals or Huber's loss function.
 	};
 
 	//defines the controlparameters common in all the robust regression algorithms
-	//the tolerance parameter sets the measure, together with the statistical estimator, how outliers are to be rejected.
-	//then one has various parameters that set a time or a iteration number after which the algorithm stops if no improvement has been made.
+	//the outlier_tolerance parameter sets a scalar quantity, together with the statistical estimator given by rejection_method,
+	//how outliers are to be rejected.then one has various parameters that set a time or an iteration number after which the
+	//algorithm stops if no improvement has been made.
 	//finally, the maximum number of outliers sets the maximum number of outliers which the robust algorithms can find. 
 	// if set to zero, the algorithms will designate at maximum 30% of the input datapoints as outliers  
-	struct control: LossFunctions::errorfunction
+	struct control
 	{
 		double outlier_tolerance{ 3.0 };
 		estimator_name rejection_method{ tolerance_is_decision_in_S_ESTIMATION };
@@ -89,7 +120,7 @@ namespace Robust_Regression
 
 	//defines controlparameters for the linear robust algorithm. Whether median regression will be used inside the robust
 	//algorithms, and a tolerable error, after which the algorithm stops. 
-	struct linear_algorithm_control : Robust_Regression::control
+	struct linear_algorithm_control : Robust_Regression::control, LossFunctions::errorfunction
 	{
 		bool use_median_regression{ false };
 		double tolerable_error{ DBL_EPSILON };
