@@ -26,7 +26,8 @@ SOFTWARE.
 #include <execution>
 #include <omp.h>
 #include "matrixcode.h"
-
+#include <type_traits>
+using signed_size_t = std::make_signed_t<std::size_t>;
 using namespace std;
 
 
@@ -62,7 +63,7 @@ ROBUSTREGRESSION_API inline Vector Vector::operator=(Vector& B)
 {
 	size_t s = B.Size();
 	m.resize(s);
-	for (long j = 0; j < s;j++)
+	for (size_t j = 0; j < s;j++)
 	{
 		m[j] = B(j);
 	}
@@ -79,8 +80,8 @@ ROBUSTREGRESSION_API inline Vector Vector::operator=(Vector* B)
 ROBUSTREGRESSION_API inline Vector Vector::operator+(const Vector& B) const{
 	Vector sum(m.size());
 
-#pragma omp parallel for
-	for (long i = 0; i < m.size(); i++)
+
+	for (size_t i = 0; i < m.size(); i++)
 	{
 		sum(i) = m[i] + B(i);
 	}
@@ -90,7 +91,7 @@ ROBUSTREGRESSION_API inline Vector Vector::operator -(const Vector& B)const {
 	Vector sum(m.size());
 
 #pragma omp parallel for
-	for (long i = 0; i < m.size(); i++)
+	for (signed_size_t i = 0; i < m.size(); i++)
 	{
 		sum(i) = m[i] - B(i);
 	}
@@ -99,8 +100,8 @@ ROBUSTREGRESSION_API inline Vector Vector::operator -(const Vector& B)const {
 ROBUSTREGRESSION_API inline double Vector::operator*(const Vector& B)const {
 	double sum = 0;
 
-#pragma omp parallel for
-	for (long i = 0; i < m.size(); i++)
+#pragma omp simd
+	for (size_t i = 0; i < m.size(); i++)
 	{
 		sum += m[i] * B(i);
 	}
@@ -110,8 +111,8 @@ ROBUSTREGRESSION_API inline double Vector::operator*(const Vector& B)const {
 
 ROBUSTREGRESSION_API inline Vector Vector::operator*(const double& B)const {
 	Vector sum(m.size());
-#pragma omp parallel for
-	for (long i = 0; i < m.size(); i++)
+
+	for (size_t i = 0; i < m.size(); i++)
 	{
 		sum(i) = m[i] * B;
 	}
@@ -121,8 +122,7 @@ ROBUSTREGRESSION_API inline Vector Vector::operator/(const double& B) const{
 	Vector sum(this->Size());
 	if (B != 0)
 	{
-#pragma omp parallel for
-		for (long i = 0; i < m.size(); i++)
+		for (size_t i = 0; i < m.size(); i++)
 		{
 			sum(i) = m[i] / B;
 		}
@@ -149,11 +149,9 @@ ROBUSTREGRESSION_API inline const double& Vector::operator()(const size_t i)cons
 
  ROBUSTREGRESSION_API inline void Matrixcode::printvector(const Vector &v)
  {
-#pragma omp parallel for
-	 for (long i = 0; i < v.Size(); i++)
+	 for (size_t i = 0; i < v.Size(); i++)
 	 {
 		 cout << v(i) << " ";
-
 	 }
 	 cout << endl;
  }
@@ -183,8 +181,8 @@ ROBUSTREGRESSION_API inline const double& Vector::operator()(const size_t i)cons
 ROBUSTREGRESSION_API inline  Matrix Matrixcode::Identity(const size_t rows, const size_t columns)
 {
 	Matrix m(rows, columns);
-#pragma omp parallel for
-	for (long i = 0; i < rows; i++)
+
+	for (size_t i = 0; i < rows; i++)
 	{
 		if (i < columns)
 		{
@@ -198,8 +196,7 @@ ROBUSTREGRESSION_API inline Matrix Matrixcode::Diagonal(const Matrix &m)
 	size_t u = m.Rows();
 	Matrix m1(u, m.Columns());
 
-#pragma omp parallel for
-	for (long i = 0; i < u; i++)
+	for (size_t i = 0; i < u; i++)
 	{
 		m1(i, i) = m(i, i);
 	}
@@ -216,7 +213,6 @@ ROBUSTREGRESSION_API inline void Matrix::SwapRows(const size_t row1, const size_
 
 	  if (row1 != row2) 
 	  {
-#pragma omp parallel for
 		  for (size_t j = 0; j < c; j++) {
 			  std::swap(m[row1 *c + j], m[row2 * c + j]);
 		  }
@@ -236,8 +232,8 @@ ROBUSTREGRESSION_API inline valarray<double> Matrixcode::Gaussian_algorithm(cons
 
 		//Create a copy of the matrix
 		Matrix m2(u, t + 1);
-#pragma omp parallel for
-		for (long i = 0; i < u; i++)
+
+		for (size_t i = 0; i < u; i++)
 		{
 			for (size_t j = 0; j < t; j++)
 			{
@@ -248,7 +244,8 @@ ROBUSTREGRESSION_API inline valarray<double> Matrixcode::Gaussian_algorithm(cons
 
 		valarray<double>result(v.size());
 
-		for (size_t j = 0; j < t; j++) {
+		for (size_t j = 0; j < t; j++)
+		{
 			size_t pivot_row = j;
 
 			// Find the pivot row with the largest element in the column
@@ -265,12 +262,10 @@ ROBUSTREGRESSION_API inline valarray<double> Matrixcode::Gaussian_algorithm(cons
 			// Gaussian elimination steps using pivoting
 			double pivot_value = m2(j, j);
 
-#pragma omp parallel for
 			for (size_t k = j; k < t + 1; k++) {
 				m2(j, k) /= pivot_value;
 			}
 
-#pragma omp parallel for
 			for (size_t i = j + 1; i < u; i++) {
 				double factor = m2(i, j);
 				for (size_t k = j; k < t + 1; k++) {
@@ -279,9 +274,7 @@ ROBUSTREGRESSION_API inline valarray<double> Matrixcode::Gaussian_algorithm(cons
 			}
 		}
 
-		// Back-substitution
 
-#pragma omp parallel for
 		for (size_t i = t; i > 0; i--) {
 			double sum = 0.0;
 			for (size_t j = (size_t)i; j < t; j++) {
@@ -306,7 +299,7 @@ ROBUSTREGRESSION_API inline void Matrix::Resize(const size_t rows,const size_t c
 ROBUSTREGRESSION_API inline Matrix Matrix::operator+(const Matrix& B) const{
 	Matrix sum(c, r);
 #pragma omp parallel for
-	for (long i = 0; i < r; i++)
+	for (signed_size_t i = 0; i < r; i++)
 	{
 		for (size_t j = 0; j < c; j++)
 		{
@@ -318,8 +311,7 @@ ROBUSTREGRESSION_API inline Matrix Matrix::operator+(const Matrix& B) const{
 
 ROBUSTREGRESSION_API inline  Matrix Matrix::operator-(const Matrix& B) const{
 	Matrix diff(r, c);
-#pragma omp parallel for
-	for (long i = 0; i < r; i++)
+	for (signed_size_t i = 0; i < r; i++)
 	{
 		for (size_t j = 0; j < c; j++)
 		{
@@ -335,7 +327,6 @@ ROBUSTREGRESSION_API inline Matrix Matrix::operator*(const Matrix& B) const{
 
 	if (c == B.Rows())
 	{
-#pragma omp parallel for
 		for (long i = 0; i < r; i++)
 		{
 			for (size_t j = 0; j < B.Columns(); j++)
@@ -347,7 +338,6 @@ ROBUSTREGRESSION_API inline Matrix Matrix::operator*(const Matrix& B) const{
 				}
 				multip(i, j) = temp;
 			}
-
 		}
 	}
 	return multip;
@@ -355,8 +345,7 @@ ROBUSTREGRESSION_API inline Matrix Matrix::operator*(const Matrix& B) const{
 
 ROBUSTREGRESSION_API inline Matrix Matrix::operator*(const double& scalar) const{
 	Matrix result(r, c);
-#pragma omp parallel for
-	for (long i = 0; i < r; i++)
+	for (signed_size_t i = 0; i < r; i++)
 	{
 		for (size_t j = 0; j < c; j++)
 		{
@@ -371,8 +360,7 @@ ROBUSTREGRESSION_API inline Vector Matrix::operator*(const Vector& B)const {
 	Vector result((this)->Rows());
 	if (B.Size() == (this)->Columns())
 	{
-#pragma omp parallel for
-		for (long i = 0; i < r; i++)
+		for (signed_size_t i = 0; i < r; i++)
 		{
 			double sum = 0;
 			for (size_t j = 0; j < c; j++)
@@ -391,8 +379,7 @@ ROBUSTREGRESSION_API inline valarray<double> Matrix::operator*(const valarray<do
 
 	if (B.size() == (this)->Columns())
 	{
-#pragma omp parallel for
-		for (long i = 0; i < r; i++)
+		for (signed_size_t i = 0; i < r; i++)
 		{
 			double sum = 0;
 			for (size_t j = 0; j < c; j++)
@@ -409,8 +396,7 @@ ROBUSTREGRESSION_API inline valarray<double> Matrix::operator*(const valarray<do
 
 ROBUSTREGRESSION_API inline Matrix Matrix::operator/(const double&scalar) const {
 	Matrix result(r, c);
-#pragma omp parallel for
-	for (long i = 0; i < r; i++)
+	for (signed_size_t i = 0; i < r; i++)
 	{
 		for (size_t j = 0; j < c; j++)
 		{
@@ -447,8 +433,7 @@ ROBUSTREGRESSION_API inline Matrix Matrixcode::Transpose(const Matrix &m)
 	size_t c = m.Columns();
 	size_t r = m.Rows();
 	Matrix t(c, r);
-#pragma omp parallel for
-	for (long i = 0; i < c; i++)
+	for (signed_size_t i = 0; i < c; i++)
 	{
 		for (size_t j = 0; j < r; j++) {
 			t(i, j) = m(j, i);
@@ -459,8 +444,7 @@ ROBUSTREGRESSION_API inline Matrix Matrixcode::Transpose(const Matrix &m)
 
 ROBUSTREGRESSION_API inline void Matrixcode::printmatrix(const Matrix &m)
 {
-#pragma omp parallel for
-	for (long i = 0; i < m.Rows(); i++)
+	for (signed_size_t i = 0; i < m.Rows(); i++)
 	{
 		for (size_t j = 0; j < m.Columns(); j++)
 		{
