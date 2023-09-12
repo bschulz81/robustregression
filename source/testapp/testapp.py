@@ -73,7 +73,8 @@ print(rrl.StatisticFunctions.Q3(X0))
 print("\nCompute the Standard deviation of the array")
 print(rrl.StatisticFunctions.stdeviation(X0))
 
-
+print("Printing a docstring")
+print (rrl.MatrixCode.Identity.__doc__)
 
 
 
@@ -104,20 +105,20 @@ m3[2, 2] = 1
 
 m3.Printmatrix();
 
-print("another way to initialize the matrix m in a single line")
+print("Another way to initialize the matrix m in a single line")
 m4=rrl.MatrixCode.Matrix(3,3,[1,2,-1,1,1,-1,2,-1,1])
 m4.Printmatrix()
 
 v=rrl.MatrixCode.Vector ([2,0,3])
 
-print("print a vector v with a command")
+print("Print a vector v with a command")
 v.Printvector()
 
 
 print("\nGaussian algorithm M*res=v")
 res=rrl.MatrixCode.Gaussian_algorithm(m3, v)
 
-print("print the elements of the vector elementwise, maybe floating point conversion effects occur.")
+print("Print the elements of the vector elementwise, maybe floating point conversion effects occur.")
 for item in range(0,3):
     print(res[item])
 
@@ -133,6 +134,8 @@ Ya=rrl.MatrixCode.Vector(Y)
 Xa.Printvector()
 Ya.Printvector()
 
+print("Printing a docstring of a member of a struct")
+print(rrl.LinearRegression.result.main_slope.__doc__)
 
 print("\nLinear Regression of X and Y")
 
