@@ -104,14 +104,14 @@ private:
 
 namespace Matrixcode
 {
-	//solves a linear equation. expects a matrix and a vector and returns a vector.
+	//Solves a linear equation. expects a matrix and a vector and returns a vector.
 	ROBUSTREGRESSION_API Vector Gaussian_algorithm(const Matrix &m, const Vector& v);
 	ROBUSTREGRESSION_API valarray<double> Gaussian_algorithm(const Matrix &m, const  valarray<double>& v);
-	//yields the transpose of a matrix
+	//Yields the transpose of a matrix
 	ROBUSTREGRESSION_API Matrix Transpose(const Matrix& m);
-	//yields an identity matrix
+	//Yields an identity matrix
 	ROBUSTREGRESSION_API Matrix Identity(const size_t rows, const size_t columns);
-	//yields the diagonal of a matrix, with all other entries put to zero.
+	//Yields the diagonal of a matrix, with all other entries put to zero.
 	ROBUSTREGRESSION_API Matrix Diagonal(const Matrix& m);
 
 
