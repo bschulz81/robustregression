@@ -47,7 +47,7 @@ double G(double y, size_t nu);
 
 double H(double y, size_t nu);
 
-ROBUSTREGRESSION_API inline  double Statisticfunctions::fabs(double f) {
+inline  double Statisticfunctions::fabs(double f) {
 	return (f < 0) ? -f : f;
 }
 
@@ -232,184 +232,404 @@ ROBUSTREGRESSION_API inline  size_t  Statisticfunctions::binomial(size_t n, size
 		return(size_t)(prod2 / prod1);
 	}
 }
-
-
-ROBUSTREGRESSION_API inline  double  Statisticfunctions::Q_estimator(valarray<double>& err)
+ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray<double>& arr)
 {
-	size_t s = err.size();
-	valarray<double> t1(binomial(s, 2));
-
-
-
-
-
-	size_t i = 0;
-	for (size_t w = 0; w < s - 1; w++)
+	size_t n = arr.size();
+	std::valarray<double>helper(n);
+	if (n < 8)
 	{
-		for (size_t k = w + 1; k < s; k++)
+		size_t nminus = n - 1;
+		std::valarray<double>t1(nminus);
+		for (size_t i = 0; i < n; i++)
 		{
-			t1[i] = (Statisticfunctions::fabs((err)[w] - (err)[k]));
-			i++;
+			size_t q = 0;
+			for (size_t k = 0; k < n; k++)
+			{
+				if (i != k)
+				{
+					t1[q] = (Statisticfunctions::fabs(arr[i] - arr[k]));
+					q += 1;
+				}
+			}
+			helper[i] = (lowmedian(t1));
 		}
-	}
-	size_t h = s / 2 + 1;
-	size_t k = binomial(h, 2) - 1;
-
-#if __cplusplus == 201703L && !defined(MACOSX)
-	std::nth_element(std::execution::par, std::begin(t1), std::begin(t1) + k, std::end(t1));
-#else
-	std::nth_element(std::begin(t1), std::begin(t1) + k, std::end(t1));
-#endif
-
-
-	double cn[] = { 0,0,0.399, 0.994, 0.512 ,0.844 ,0.611, 0.857, 0.669 ,0.872 };
-	double cc = 1;
-	if (s <= 9)
-	{
-		cc = cn[s];
 	}
 	else
 	{
-		if (s % 2 != 0)
+		valarray<double> y(arr);
+		std::sort(std::begin(y), std::end(y));
+
+		helper[0] = (y)[n / 2] - (y)[0];
+		helper[n - 1] = (y)[n - 1] - (y)[(n + 1) / 2 - 1];
+
+		for (size_t i = 1; i < (n + 1) / 2; i++)
 		{
-			cc = s / (s + 1.4);
-		}
-		else
-		{
-			cc = s / (s + 3.8);
-		}
-	}
-	return cc * 2.2219 * t1[k];
-}
-
-
-
-ROBUSTREGRESSION_API inline   double    Statisticfunctions::S_estimator(valarray<double>& err)
-{
-    valarray<double> x(err);
-    size_t n = x.size();
-    std::valarray<double> a2(n); 
-
-    std::sort(std::begin(x), std::begin(x) + n);
-
-	a2[0] = x[n / 2] - x[0];
-	a2[n - 1] = x[n - 1] - x[(n + 1) / 2 - 1];
-    
-
-
-	for (size_t i = 1; i < (n + 1) / 2; i++)
-	{
-		size_t leftB, rightB,
-			nB = n - i - 1,
-			diff2 = (nB - i) / 2,
-			Amin = diff2,
-			Amax = diff2 + i,
-			leftA = leftB = 1,
-			rightA = rightB = nB;
-		while (leftA < rightA)
-		{
-			size_t l = rightA - leftA,
-				half = l / 2,
-				even = l % 2,
-				tryA = leftA + half,
-				tryB = leftB + half;
-			if (tryA > Amin)
+			size_t nB = n - i - 1,
+				diff2 = (nB - i) / 2,
+				leftA = 1,
+				leftB = 1,
+				rightA = nB,
+				rightB = nB,
+				Amin = diff2,
+				Amax = diff2 + i;
+			while (leftA < rightA)
 			{
-				if (tryA > Amax)
+				size_t length = rightA - leftA,
+					half = length / 2,
+					even = length % 2,
+					tryA = leftA + half,
+					tryB = leftB + half;
+				if (tryA > Amin)
 				{
-					rightA = tryA;
-					leftB = tryB + even;
-				}
-				else
-				{
-					if (x[i] - x[i - tryA + Amin] < x[tryB + i] - x[i])
-					{
-						rightB = tryB;
-						leftA = tryA + even;
-					}
-					else
+					if (tryA > Amax)
 					{
 						rightA = tryA;
 						leftB = tryB + even;
 					}
-				}
-			}
-			else
-			{
-				rightB = tryB;
-				leftA = tryA + even;
-			}
-		}
-		if (leftA > Amax)
-			a2[i] = x[leftB + i] - x[i];
-		else
-			a2[i] = std::min(x[i] - x[i - leftA + Amin], x[leftB + i] - x[i]);
-	}
-
-	for (size_t i = (n + 1) / 2; i < n - 1; i++)
-	{
-		size_t leftB,rightB, nA = n - i - 1,
-			diff2 = (i - nA) / 2,
-			leftA = leftB=1,
-			rightA = rightB= i,
-			Amin = diff2 + 1,
-			Amax = diff2 + nA;
-		while (leftA < rightA)
-		{
-			size_t l = rightA - leftA,
-				half = l / 2,
-				even = l % 2,
-				tryA = leftA + half,
-				tryB = leftB + half;
-			if (tryA < Amin)
-			{
-				rightB = tryB;
-				leftA = tryA + even;
-			}
-			else
-			{
-				if (tryA > Amax)
-				{
-					rightA = tryA;
-					leftB = tryB + even;
+					else
+					{
+						double medA = y[i] - y[i - tryA + Amin],
+							medB = y[tryB + i] - y[i];
+						if (medA < medB)
+						{
+							rightB = tryB;
+							leftA = tryA + even;
+						}
+						else
+						{
+							rightA = tryA;
+							leftB = tryB + even;
+						}
+					}
 				}
 				else
 				{
-					if (x[i + tryA - Amin + 1] - x[i] < x[i] - x[i - tryB])
-					{
-						rightB = tryB;
-						leftA = tryA + even;
-					}
-					else
+					rightB = tryB;
+					leftA = tryA + even;
+				}
+			}
+			if (leftA > Amax)
+			{
+				helper[i] = y[leftB + i] - y[i];
+			}
+			else
+			{
+				double medA = y[i] - y[i - leftA + Amin],
+					medB = y[leftB + i] - y[i];
+				helper[i] = std::min(medA, medB);
+			}
+		}
+
+		for (size_t i = (n + 1) / 2; i < n - 1; i++)
+		{
+			size_t nA = n - i - 1,
+				diff2 = (i - nA) / 2,
+				leftA = 1,
+				leftB = 1,
+				rightA = i,
+				rightB = i,
+				Amin = diff2 + 1,
+				Amax = diff2 + nA;
+			while (leftA < rightA)
+			{
+				size_t length = rightA - leftA,
+					half = length / 2,
+					even = length % 2,
+					tryA = leftA + half,
+					tryB = leftB + half;
+				if (tryA < Amin)
+				{
+					rightB = tryB;
+					leftA = tryA + even;
+				}
+				else
+				{
+					if (tryA > Amax)
 					{
 						rightA = tryA;
 						leftB = tryB + even;
 					}
+					else
+					{
+						double medA = y[i + tryA - Amin + 1] - y[i],
+							medB = y[i] - y[i - tryB];
+						if (medA < medB)
+						{
+							rightB = tryB;
+							leftA = tryA + even;
+						}
+						else
+						{
+							rightA = tryA;
+							leftB = tryB + even;
+						}
+					}
 				}
 			}
+			if (leftA > Amax)
+			{
+				helper[i] = y[i] - y[i - leftB];
+			}
+			else
+			{
+				double medA = y[i + leftA - Amin + 1] - y[i],
+					medB = y[i] - y[i - leftB];
+				helper[i] = std::min(medA, medB);
+			}
 		}
-		if (leftA > Amax)
-			a2[i] = x[i] - x[i - leftB];
-		else
-			a2[i] = std::min(x[i + leftA - Amin + 1] - x[i], x[i] - x[i - leftB]);
 	}
 
-	double cn = 1.0;
-     if (n <= 9) 
-    {
-        double mynum[10] = {0,0, 0.743, 1.851, 0.954,1.351, 0.993, 1.198 ,1.005, 1.131 };
-        cn = mynum[n];
-    }
-    else {
-        if (n % 2 == 1) 
-            cn = n / (n - 0.9);
-    }
-
-   return cn * 1.1926 * lowmedian(a2);
+	double c = 1;
+	double const cn[] = { 0,0, 0.743, 1.851, 0.954 ,1.351, 0.993, 1.198 ,1.005, 1.131 };
+	if (n <= 9)
+	{
+		c = cn[n];
+	}
+	else
+	{
+		if (n % 2 != 0)
+		{
+			c = n / (n - 0.9);
+		}
+	}
+	return c * 1.1926 * lowmedian(helper);
 }
 
 
-ROBUSTREGRESSION_API inline   double    Statisticfunctions::MAD_estimator(valarray<double>& err, double& m)
+
+
+
+double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t n) {
+	std::valarray<double> acand(n);
+	std::valarray<size_t> iwcand(n);
+	size_t wtotal = 0, wrest = 0, wleft, wmid, wright;
+	size_t nn = n;
+	for (size_t i = 0; i < nn; i++)
+	{
+		wtotal += iw[i];
+	}
+
+	while (true) {
+		size_t k = nn / 2;
+		valarray<double> b(a);
+		std::nth_element(std::begin(b), std::begin(b) + k, std::begin(b) + nn);
+		double trial = b[k];
+
+		wleft = 0;
+		wmid = 0;
+		wright = 0;
+		for (size_t i = 0; i < nn; i++)
+		{
+			if (a[i] < trial)
+			{
+				wleft += iw[i];
+			}
+			else if (a[i] > trial)
+			{
+				wright += iw[i];
+			}
+			else
+			{
+				wmid += iw[i];
+			}
+		}
+
+		if ((2 * wrest + 2 * wleft) > wtotal)
+		{
+			size_t kcand = 0;
+			for (size_t i = 0; i < nn; i++)
+			{
+				if (a[i] < trial)
+				{
+					acand[kcand] = a[i];
+					iwcand[kcand] = iw[i];
+					kcand += 1;
+				}
+			}
+			nn = kcand;
+		}
+		else if ((2 * wrest + 2 * wleft + 2 * wmid) > wtotal)
+		{
+			return trial;
+		}
+		else
+		{
+			size_t kcand = 0;
+			for (size_t i = 0; i < nn; i++) {
+				if (a[i] > trial)
+				{
+					acand[kcand] = a[i];
+					iwcand[kcand] = iw[i];
+					kcand += 1;
+				}
+			}
+			nn = kcand;
+			wrest += wleft + wmid;
+		}
+		for (size_t i = 0; i < nn; i++)
+		{
+			a[i] = acand[i];
+			iw[i] = iwcand[i];
+		}
+	}
+}
+
+
+
+ROBUSTREGRESSION_API inline double Statisticfunctions::Q_estimator(std::valarray<double>& x) {
+
+	size_t n = x.size();
+	double QN;
+	if (n < 100)
+	{
+		size_t s = x.size();
+		size_t h = s / 2 + 1;
+		size_t k = binomial(h, 2) - 1;
+		valarray<double> t1(binomial(s, 2));
+
+		size_t i = 0;
+		for (size_t w = 0; w < s - 1; w++)
+		{
+			for (size_t l = w + 1; l < s; l++)
+			{
+				t1[i] = (Statisticfunctions::fabs(x[w] - x[l]));
+				i += 1;
+			}
+		}
+
+#if __cplusplus == 201703L && !defined(MACOSX)
+		std::nth_element(std::execution::par, std::begin(t1), std::begin(t1) + k, std::end(t1));
+#else
+		std::nth_element(std::begin(t1), std::begin(t1) + k, std::end(t1));
+#endif
+		QN = t1[k];
+	}
+	else
+	{
+
+
+		valarray<double>y(x);
+		std::sort(std::begin(y), std::end(y));
+		std::valarray<double> work(n);
+		std::valarray<size_t> left(n), right(n), weight(n), Q(n), P(n);
+		for (size_t i = 0; i < n; i++)
+		{
+			left[i] = n - i + 1;
+			right[i] = n;
+		}
+
+		size_t h = n / 2 + 1;
+		size_t k = h * (h - 1) / 2;
+		size_t jhelp = n * (n + 1) / 2;
+		size_t knew = k + jhelp;
+		size_t nL = jhelp;
+		size_t nR = n * n;
+		bool found = false;
+		while (nR - nL > n && !found)
+		{
+			size_t j = 0;
+			for (size_t i = 1; i < n; i++)
+			{
+				if (left[i] <= right[i])
+				{
+					weight[j] = right[i] - left[i] + 1;
+					work[j] = y[i] - y[n - (left[i] + weight[j] / 2)];
+					j += 1;
+				}
+			}
+			double trial = whimed(work, weight, j - 1);
+			j = 0;
+			for (size_t i = n; i >= 1; i--)
+			{
+				while (j < n && y[i - 1] - y[n - j - 1] < trial)
+				{
+					j++;
+				}
+				P[i - 1] = j;
+			}
+			j = n + 1;
+			for (size_t i = 0; i < n; i++)
+			{
+				while (y[i] - y[n - j + 1] > trial)
+				{
+					j--;
+				}
+				Q[i] = j;
+			}
+			size_t sumP = 0, sumQ = 0;
+
+			for (size_t i = 0; i < n; i++)
+			{
+				sumP += P[i];
+				sumQ += Q[i] - 1;
+			}
+			if (knew <= sumP)
+			{
+				for (size_t i = 0; i < n; i++)
+				{
+					right[i] = P[i];
+				}
+				nR = sumP;
+			}
+			else {
+				if (knew > sumQ)
+				{
+					for (size_t i = 0; i < n; i++)
+					{
+						left[i] = Q[i];
+					}
+					nL = sumQ;
+				}
+				else
+				{
+					QN = trial;
+					found = true;
+				}
+			}
+		}
+		if (!found)
+		{
+			size_t j = 0;
+			for (size_t i = 1; i < n; i++)
+			{
+				if (left[i] <= right[i])
+				{
+					for (size_t jj = left[i]; jj <= right[i]; jj++)
+					{
+						work[j] = y[i] - y[n - jj];
+						j += 1;
+					}
+				}
+			}
+			size_t u = knew - nL - 1;
+			std::nth_element(std::begin(work), std::begin(work) + u, std::begin(work) + j);
+			QN = work[u];
+		}
+	}
+	double cc = 1.0;
+	double cn[] = { 0,0,0.399, 0.994, 0.512 ,0.844 ,0.611, 0.857, 0.669 ,0.872 };
+	if (n <= 9)
+	{
+		cc = cn[n];
+	}
+	else
+	{
+		if (n % 2 != 0)
+		{
+			cc = n / (n + 1.4);
+		}
+		else
+		{
+			cc = n / (n + 3.8);
+		}
+	}
+	return cc * 2.2219 * QN;
+}
+
+
+
+
+ROBUSTREGRESSION_API inline   double  Statisticfunctions::MAD_estimator(valarray<double>& err, double& m)
 {
 	size_t s = err.size();
 	valarray<double>m1(s);
