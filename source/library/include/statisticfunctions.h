@@ -65,16 +65,16 @@ namespace Statisticfunctions
 	ROBUSTREGRESSION_API size_t binomial(size_t n, size_t k);
 
 
-	// Computes the Q estimator of Croux and Rousseuuw for a array.
+	// Computes the Q estimator of Croux and Rousseuuw for an array.
 	// The estimator was published in
 	// Peter J. Rousseeuw, Christophe Croux, Alternatives to the Median-Absolute Deviation
 	// J. of the Amer. Statistical Assoc. (Theory and Methods), 88 (1993),p. 1273,
 	// Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale.
 	// In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg.
-	// https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.)
+	// https://doi.org/10.1007/978-3-662-26811-7_58 
 	ROBUSTREGRESSION_API double Q_estimator(valarray<double>& err );
 
-	//Computes the S estimator of rousseuuw for an array of size s. 
+	//Computes the S estimator of rousseuuw for an array. 
 	//The estimator was published in 
 	// Peter J. Rousseeuw, Christophe Croux, Alternatives to the Median-Absolute Deviation
 	// J. of the Amer. Statistical Assoc. (Theory and Methods), 88 (1993),p. 1273, and
@@ -86,7 +86,7 @@ namespace Statisticfunctions
 	// it was actually non-trivial to convert from Fortran to C.
 	ROBUSTREGRESSION_API double S_estimator(valarray<double>& err);
 
-	// Computes the mad estimator. It needs the median of the array. The coefficients in front of the MAD used here were found in
+	// Computes the MAD estimator. It needs the median of the array. The coefficients in front of the MAD used here were found in
 	// Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale.
 	// In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg.
 	// https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.)
@@ -99,11 +99,12 @@ namespace Statisticfunctions
 	ROBUSTREGRESSION_API double T_estimator(valarray<double>& err);
 
 	//Computes the biweight midvariance for one step for an array,
-	//  It expects the median m and the size of the array 
+	//  It expects the median m of the array. The estimator is described in 
 	//   T. C. Beers,K. Flynn and K. Gebhardt,  Astron. J. 100 (1),32 (1990)
 	ROBUSTREGRESSION_API double onestepbiweightmidvariance(valarray<double>& err, double& m);
 
-	//Compute the interquartiles
+	//Compute the Quartile Q3
 	ROBUSTREGRESSION_API double Q3(valarray<double> m);
+	//Computes the Quartile Q1
 	ROBUSTREGRESSION_API double Q1(valarray<double> m);
 }
