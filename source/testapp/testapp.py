@@ -24,7 +24,8 @@ SOFTWARE.
 ## Similar to the test application in c++
 
 
-##load the library
+# load the library if it is not installed by setuptools (pip) but just compiled by cmake and in the 
+# same directory as the python script.
 import sys
 import os.path
 import importlib.util
@@ -33,7 +34,19 @@ dir_path = os.path.dirname(file_path)
 sys.path.append(dir_path)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+
+# Shows the sub-modules that can be imported from pyRobustRegressionLib.
+# In the following, we will. however, use the full paths.
 import pyRobustRegressionLib as rrl
+from   pyRobustRegressionLib import StatisticFunctions
+from   pyRobustRegressionLib import LinearRegression
+from   pyRobustRegressionLib import MatrixCode
+from   pyRobustRegressionLib import NonLinearRegression
+from   pyRobustRegressionLib import RobustRegression
+
+
+print("\nPrint the description of the sub-modules of pyRobustRegressionLib\n\n")
+print(print(rrl.__doc__))
 
 
 ##callback functions that will be given to the c library.
@@ -53,9 +66,17 @@ def Jacobi(X, beta):
 	return m
 
 
-## now we run some tests
 
-print(" 5!= ")
+
+print("\n\n Now we run some very simple tests.\n\n")
+print(""" Some of the algorithms are time consuming. Especially the modified lts/forward-search algorithms.
+Therefore, and since this python script is only a demonstration of the function calls of the library
+only extremely simple datasets are tried out here that can be written down by hand.
+(So for very large data, the iterative outlier removal method may be better suited than the forward search.\n""")
+
+
+
+print("\n 5!= ")
 print(rrl.StatisticFunctions.factorial(5))
 
 
