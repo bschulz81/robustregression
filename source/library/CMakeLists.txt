@@ -49,10 +49,9 @@ if(${WITH_PYTHON})
     find_package(Python3 COMPONENTS Interpreter Development)  
     find_package(pybind11 CONFIG REQUIRED )
 
-    set_target_properties(Python3::Module PROPERTIES
-        MAP_IMPORTED_CONFIG_DEBUG ";RELEASE")
+    set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_DEBUG ";RELEASE")
 
-    pybind11_add_module(pyRobustRegressionLib ${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/pythonbindings.cpp)
+    pybind11_add_module(pyRobustRegressionLib ${CMAKE_CURRENT_SOURCE_DIR}/src/pyRobustRegressionLib/pyRobustRegressionLib.cpp)
 
     target_include_directories(pyRobustRegressionLib PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include" ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -83,5 +82,9 @@ if(${WITH_PYTHON})
 
    target_link_libraries(pyRobustRegressionLib PUBLIC RobustRegressionLib)
 
- 
+   if(DEFINED SKBUILD)
+        install(TARGETS RobustRegressionLib DESTINATION .)
+        install(TARGETS pyRobustRegressionLib DESTINATION .)
+    endif()
 endif()
+
