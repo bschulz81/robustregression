@@ -60,6 +60,7 @@ Per default, the CMake variable $WithPython is ON. If one wants to use the pytho
 going into the /source directory and then one can install it install with pip, i.e.
 
 cd /source
+
 pip install .
 
 After that, the binary extension is copied into a path for python wheel extensions, where python scripts can find it.
@@ -67,6 +68,7 @@ After that, the binary extension is copied into a path for python wheel extensio
 In addition, a build directory should appear where the c++ testapplication can be found together with a binary.
 
 one can uninstall the module by typing
+
 
 pip uninstall pyRobustRegressionLib
 
