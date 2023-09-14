@@ -12,7 +12,7 @@ The library offers python bindings for most functions. So the programmer has the
 compile the library with python bindings Pybind11 and Python3 should be installed and be found by CMake. 
 Otherwise, only the C++ standard template library is used, together with OpenMP. 
 
-The documentation of the functions that the library uses are written in the header files.
+The documentation of the functions that the library uses are written in the C++header files and in the __doc__ methods of the python bindings.
 
 In addition, a c++ application and a python script is provided that show the functions of the library with very simple data.
 
@@ -46,9 +46,41 @@ Some references are:
 7. Rousseeuw, P. J. (1984).Journal of the American Statistical Association. 79 (388): 871–880. doi:10.1080/01621459.1984.10477105. JSTOR 2288718.
    Rousseeuw, P. J.; Leroy, A. M. (2005) [1987]. Robust Regression and Outlier Detection. Wiley. doi:10.1002/0471725382. ISBN 978-0-471-85233-9, for the least trimmed squares algorithm
 8. Hadi and Simonoff, J. Amer. Statist. Assoc. 88 (1993) 1264-1272, Atkinson and Riani,Robust Diagnostic Regression Analysis (2000), Springer, for the forward search
-9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.) The version of the S estimator in this library now is adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C.
+9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.) The versions of the S and Q estimators in this library are npw adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C. Especially for the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
 
 # Compiling and Installing the library:
-The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard (per default, it uses C17, but with a switch in the CMakeLists.txt for the library, it can use C14. 
-It also makes use of OpenMP and needs Python in version 3 and pybind 11 to compile. After compilation with CMake, an /out folder appears where the library and the compiled test applications and a python test script can be found which demonstrate how to use the library.
+
+The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard (per default, if one does not use Clang or MacOs, it uses C17, but with a CXX_STANDARD 14 switch set in the CMakeLists.txt for the library, it can use C14, which is the the default for Clang and MacOS.) 
+
+The library also makes use of OpenMP and needs Python in version 3 and pybind11 to compile. 
+
+
+
+Per default, the CMake variable $WithPython is ON. If one wants to use the python module one can compile and install the module by 
+going into the /source directory and then one can install it install with pip, i.e.
+
+cd /source
+pip install .
+
+After that, the binary extension is copied into a path for python wheel extensions, where python scripts can find it.
+
+In addition, a build directory should appear where the c++ testapplication can be found together with a binary.
+
+one can uninstall the module by typing
+
+pip uninstall pyRobustRegressionLib
+
+
+
+If one does not want the python module, one may set the cmake variable WithPython to OFF.
+
+One can compile the library also traditionally via CMake. Typing 
+
+CMake . 
+
+in the /source directory will generate the files necessary to compile the library, depending on the CMake generator set by the user.
+
+After compilation, an out directory will appear with the library in binary form and the executable testapplication in c++. 
+If the variable WithPython was set to ON, one will also find a python module and a test script in python. 
+
 
