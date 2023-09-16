@@ -135,35 +135,23 @@ int main(int argc, char* argv[])
 	printf("\n Intercept ");
 	printf("%f", res4.main_intercept);
 
-
-
 	Robust_Regression::modified_lts_control_linear ctrl;
 	Robust_Regression::linear_algorithm_result res5;
-
 	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res5);
 	printf("\n\n\nRobust regression with the same 2 inserted outliers\n");
-	printf("\nModified last trimmed squares\n");
+	printf("\nModified last trimmed squares, with the default S estimator\n");
 	printf(" Slope ");
 	printf("%f", res5.main_slope);
 	printf("\n Intercept ");
 	printf("%f", res5.main_intercept);
 	printf("\n Indices of outliers ");
 
-	for (size_t i = 0; i < res5.indices_of_removedpoints.size(); i++)
-	{
-		size_t w = res5.indices_of_removedpoints[i];
-		printf("%lu", (unsigned long)w);
-		printf(", ");
-	}
 
 	Robust_Regression::modified_lts_control_linear ctrla;
 	Robust_Regression::linear_algorithm_result res5a;
-
-
-	ctrla.rejection_method = Robust_Regression::tolerance_is_interquartile_range;
-	ctrla.outlier_tolerance = 1.5;
+	ctrla.rejection_method = Robust_Regression::tolerance_is_decision_in_Q_ESTIMATION;
 	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrla, res5a);
-	printf("\n\nRobust regression with the same 2 dataset but instead of the default S estimator, now the interquartile range method\n");
+	printf("\n\n\nRobust regression with the same 2 inserted outliers, but now with the Q Estimator\n");
 	printf("\nModified last trimmed squares\n");
 	printf(" Slope ");
 	printf("%f", res5a.main_slope);
@@ -171,9 +159,34 @@ int main(int argc, char* argv[])
 	printf("%f", res5a.main_intercept);
 	printf("\n Indices of outliers ");
 
+
+
+
 	for (size_t i = 0; i < res5a.indices_of_removedpoints.size(); i++)
 	{
 		size_t w = res5a.indices_of_removedpoints[i];
+		printf("%lu", (unsigned long)w);
+		printf(", ");
+	}
+
+	Robust_Regression::modified_lts_control_linear ctrlb;
+	Robust_Regression::linear_algorithm_result res5b;
+
+
+	ctrlb.rejection_method = Robust_Regression::tolerance_is_interquartile_range;
+	ctrlb.outlier_tolerance = 1.5;
+	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrlb, res5b);
+	printf("\n\nRobust regression with the same 2 dataset but instead of the default S estimator, now the interquartile range method\n");
+	printf("\nModified last trimmed squares\n");
+	printf(" Slope ");
+	printf("%f", res5b.main_slope);
+	printf("\n Intercept ");
+	printf("%f", res5b.main_intercept);
+	printf("\n Indices of outliers ");
+
+	for (size_t i = 0; i < res5b.indices_of_removedpoints.size(); i++)
+	{
+		size_t w = res5b.indices_of_removedpoints[i];
 		printf("%lu", (unsigned long)w);
 		printf(", ");
 	}
@@ -185,8 +198,6 @@ int main(int argc, char* argv[])
 
 
 	Robust_Regression::linear_algorithm_result res6;
-
-	ctrl.rejection_method = Robust_Regression::tolerance_is_decision_in_MAD_ESTIMATION;
 	Robust_Regression::iterative_outlier_removal_regression_linear(X2, Y2, ctrl, res6);
 	printf(" Slope ");
 	printf("%f", res6.main_slope);
@@ -212,7 +223,7 @@ int main(int argc, char* argv[])
 	init.initialguess = beta;
 
 
-	printf("\n\n\nSimpleNonlinear Regression with the original dataset");
+	printf("\n\n\nSimple Nonlinear Regression with the original dataset");
 
 	Non_Linear_Regression::non_linear_regression(X, Y, init, ctrl2, res7);
 
