@@ -47,6 +47,9 @@ double G(double y, size_t nu);
 
 double H(double y, size_t nu);
 
+double cot(double x);
+
+
 inline  double Statisticfunctions::fabs(double f) {
 	return (f < 0) ? -f : f;
 }
@@ -316,7 +319,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray
 			{
 				double medA = y[i] - y[i - leftA + Amin],
 					medB = y[leftB + i] - y[i];
-				helper[i] = std::min(medA, medB);
+				helper[i] = medA<medB? medA:medB;
 			}
 		}
 
@@ -374,7 +377,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray
 			{
 				double medA = y[i + leftA - Amin + 1] - y[i],
 					medB = y[i] - y[i - leftB];
-				helper[i] = std::min(medA, medB);
+				helper[i] = medA<medB ? medA:medB;
 			}
 		}
 	}
@@ -399,7 +402,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray
 
 
 
-double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t n) {
+inline double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t n) {
 	std::valarray<double> acand(n);
 	std::valarray<size_t> iwcand(n);
 	size_t wtotal = 0, wrest = 0, wleft, wmid, wright;
@@ -511,11 +514,10 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::Q_estimator(std::valarray
 		valarray<double>y(x);
 		std::sort(std::begin(y), std::end(y));
 		std::valarray<double> work(n);
-		std::valarray<size_t> left(n), right(n), weight(n), Q(n), P(n);
+		std::valarray<size_t> left(n), right(n,n), weight(n), Q(n), P(n);
 		for (size_t i = 0; i < n; i++)
 		{
 			left[i] = n - i + 1;
-			right[i] = n;
 		}
 
 		size_t h = n / 2 + 1;
@@ -565,19 +567,13 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::Q_estimator(std::valarray
 			}
 			if (knew <= sumP)
 			{
-				for (size_t i = 0; i < n; i++)
-				{
-					right[i] = P[i];
-				}
+				right = P;
 				nR = sumP;
 			}
 			else {
 				if (knew > sumQ)
 				{
-					for (size_t i = 0; i < n; i++)
-					{
-						left[i] = Q[i];
-					}
+					left = Q;
 					nL = sumQ;
 				}
 				else
