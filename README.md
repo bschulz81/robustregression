@@ -56,11 +56,11 @@ The library also makes use of OpenMP and needs Python in version 3 and pybind11 
 
 
 Per default, the CMake variable $WithPython is ON. If one wants to use the python module one can compile and install the module by 
-with pip, i.e.
+with pip, i.e. by typinh
 
 > pip install .
 
-After that, the binary extension is copied into a path for python wheel extensions, where python scripts can find it.
+in the package directory. After that, the binary extension is copied into a path for python wheel extensions, where python scripts can find it.
 
 In addition, a build directory should appear where the c++ testapplication can be found together with a binary.
 
