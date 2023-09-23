@@ -46,7 +46,8 @@ Some references are:
 7. Rousseeuw, P. J. (1984).Journal of the American Statistical Association. 79 (388): 871–880. doi:10.1080/01621459.1984.10477105. JSTOR 2288718.
    Rousseeuw, P. J.; Leroy, A. M. (2005) [1987]. Robust Regression and Outlier Detection. Wiley. doi:10.1002/0471725382. ISBN 978-0-471-85233-9, for the least trimmed squares algorithm
 8. Hadi and Simonoff, J. Amer. Statist. Assoc. 88 (1993) 1264-1272, Atkinson and Riani,Robust Diagnostic Regression Analysis (2000), Springer, for the forward search
-9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S and Q-estimators.) The versions of the S and Q estimators in this library are now adapted from the algorithms of Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in these algorithms, they were actually non-trivial to convert from Fortran to C. For the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
+9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 
+1. (For the faster version of the S and Q estimators.) The versions of the S and Q estimators in this library are now adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C. Especially for the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
 
 # Compiling and Installing the library:
 
@@ -83,6 +84,10 @@ After compilation, an out directory will appear with the library in binary form 
 If the variable WithPython was set to ON, one will also find a python module and a test script in python. 
 
 # Documentation of the library functions
+
+## For the Python language
+
+### Calling the documentation
 Documentation of the API is provided in C++ header files in the /library/include directory and the docstrings for the python module in the src/pyRobustRegressionLib
 Module. The latter It can be loaded in python scripts with 
 
@@ -101,7 +106,7 @@ Will list the sub-modules of the library, which are
 - RobustRegression
 
 And their docstrings can be called e.g. by
->print(rrl.*SubModuleName*.\_\_doc__)
+> print(rrl.*SubModuleName*.\_\_doc__)
 
 e.g.
 
@@ -118,12 +123,613 @@ which can be found in the /library/include directory.
 The header files can be found in the include subdirectory of the package.
 
 In the testapp folder, two example programs, one in python and one in C++ is provided.
-These test applications have extensive comments and call many functions of the library in order to show the basic usage. 
+These test applications have extensive comments and call many functions of the librarym which show the basic usage. 
 
 The curve fits that are done in the provided example programs are, however, very simple of course.
 This was done in order to keep the demonstration short and simple.
 The library is of course intended to be used with larger and much more complicated data.
 
-#
+### Simple linear regression
 
+Let us now define some vector for data X and > which we want to fit to a line.
+
+> print("\nDefine some arrays X and Y")
+> 
+> X=[-3.0,5.0,7.0,10.0,13.0,16.0,20.0,22.0]
+> 
+> Y=[-210.0,430.0,590.0,830.0,1070.0,1310.0,1630.0,1790.0]
+
+A simple linear fit can be called as follows:
+At first we create an instance of the result structure, where the result is stored.
+
+> res=rrl.LinearRegression.result()
+
+Then, we call the linear regression function
+> rrl.LinearRegression.linear_regression(X, Y, res)
+
+
+
+And finally, we print out the slope and intercept
+> print("Slope")
+> 
+> print(res.main_slope)
+> 
+> print("Intercept")
+> 
+> print(res.main_intercept)
+
+### Robust regression
+The robust regression is just slightly more complicated. Let us first add two outliers into the dats:
+
+> X2=[-3.0, 5.0,7.0, 10.0,13.0,15.0,16.0,20.0,22.0,25.0]
+> 
+> Y2=[ -210.0, 430.0, 590.0,830.0,1070.0,20.0,1310.0,1630.0,1790.0,-3.0]
+
+
+#### Median regression
+For linear regression, the library also has a median linear regression function, which can be called in the same way
+
+> rrl.LinearRegression.median_linear_regression(X2, Y2, res)
+
+but is slightly more robust.
+
+
+#### Modified forward search/modified Lts regression
+Median linear regression is a bit slower as simple linear regression and can get wrong if many outliers are present.
+
+Therefore, the library has two methods for robust regression that can remove outliers.
+
+The  structure that stores the result for robust linear regression now includes the indices of the used and rejected point.
+
+We instantiate it with
+
+> res= rrl.RobustRegression.linear_algorithm_result()
+
+Additionally, there is a struct that determines the behavior of the algorithm.  
+Upon construction without arguments, it gets filled with default values.
+
+> ctrl= rrl.RobustRegression.modified_lts_control_linear()
+
+By default, the S-estimator is used with an outlier_tolerance parameter of 3, and the method can find 30% of the points as outliers at maximum. 
+But all this can be changed, of course
+
+Now we call the modified forward search/ modified lts algorithm
+> rrl.RobustRegression.modified_lts_regression_linear(X2, Y2, ctrl, res)
+
+and then print the result, first the slope and intercept 
+> print("Slope")
+> 
+> print(res.main_slope)
+> 
+> print("Intercept")
+> 
+> print(res.main_intercept)
+
+Then the indices of the outliers
+
+> print("\nOutlier indices")
+> 
+> for ind in res.indices_of_removedpoints:
+> 
+> &emsp;print(ind)
+
+When we want to change the estimators, or the outlier tolerance parameter, the loss function, or the maximum number of outliers we can find, or other details, we can simply
+set this in the control struct.
+
+By default, the S estimator is used with an outlier_tolerance of 3 in the same formula i.e. one has
+
+> ctrl.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_decision_in_S_ESTIMATION
+
+and a point is an outlier if 
+> |err-median(errs)|/S_estimator(errs)>outlier_tolerance
+
+where err is the residuum of the point and errs is the array of residuals. 
+They are measured by a specified loss function. If none was given, squared errors are used by default. 
+
+By default, the outlier_tolerance parameter is set to 3.
+
+If we want to have a different value, e.g. 3.5, for the outlier_tolerance parameter, we can easily set e.g.
+
+> ctrl.outlier_tolerance=3.5
+
+The command below would imply that the Q estimator is used:
+
+> ctrl= rrl.RobustRegression.modified_lts_control_linear()
+> 
+> ctrl.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_decision_in_Q_ESTIMATION
+
+Then a point is an outlier if, for its residual with the curve fit err, we have,given the array of all residuals errs:
+> |err-median(errs)|/Q_estimator(errs)>outlier_tolerance
+
+
+The command below would change the estimator to the interquartile range method when the modified lts/modified forward search algorithm is used. 
+
+With the setting below, a point is an outlier if its residual is below Q1 − tolerance* IQR or above Q3 + tolerance IQR.
+If we do not change the loss function, least squares is used by default.
+
+> ctrl= rrl.RobustRegression.modified_lts_control_linear()
+> 
+> ctrl.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_interquartile_range
+
+ For the interquartile range estimator, we should set the tolerance usually to 1.5
+
+> ctrl.outlier_tolerance=1.5
+
+before we call the regression function.
+
+
+Note that the forward search can be very time consuming, as its performance is given by the binomial koefficient of the pointnumber over the maximum number of 
+outliers it can find (which per default is 30% of the pointnumber).
+
+#### Iterative outlier removal
+
+A faster algorithm is the iterative outlier removal method, which makes a curve fit with the entire points, then removes the points whose residuals are outliers and
+then makes another curve fit with the remaining point set until no outliers are found anymore.
+
+It can be called similarly:
+
+We define the control structure. Note that it is different from the modified forward search/modified lts control structure. 
+> ctrl= rrl.RobustRegression.linear_algorithm_control()
+
+And again create a structure for the result
+> res= rrl.RobustRegression.linear_algorithm_result()
+Then we start the algorithm
+> rrl.RobustRegression.iterative_outlier_removal_regression_linear(X2, Y2, ctrl, res)
+
+And print the result
+> print("Slope")
+> 
+> print(res.main_slope)
+> 
+> print("Intercept")
+> 
+> print(res.main_intercept)
+> 
+> print("\nOutlier indices")
+> 
+> for ind in res.indices_of_removedpoints:
+> 
+> &emsp;print(ind)
+
+
+
+### Non Linear Regression
+Non-linear regression uses an implementation of the Levenberg-Marquardt algorithm
+
+The Levenberg-Marquardt algorithm needs an initial guess for an array of parameters beta , a function f(X,beta) to be fitted and a Jacobi matrix J(X,beta)
+For example, a curve fit can be made by  initialising the result, control and initdata structures as follows:
+After a call of the constructors:
+
+> res=rrl.NonLinearRegression.result()
+> 
+> ctrl=rrl.NonLinearRegression.control()
+> 
+> init=rrl.NonLinearRegression.initdata()
+
+We  supply a Jacobi matrix, a function and an initial guess for the parameters to be found (assuming the function has just 2 curve fitting parameters):
+
+> init.Jacobian=Jacobi
+>
+> init.f=linear
+> 
+> init.initialguess = [1,1]
+
+Where  Jacobi and linear are two user defined functions. 
+
+If we would want to fit a line, we would have to implement the function f(X,beta) and the jacobian J(X,beta) as follows
+
+>def linear(X, beta):
+>
+> &emsp;   Y=[]
+>
+> &emsp;   for i in range(0,len(X)):
+>
+> &emsp;   &emsp;    Y.append(beta[0] * X[i] + beta[1])
+>
+> &emsp;    return Y
+
+
+> def Jacobi(X, beta):
+> 
+>&emsp;	m=rrl.MatrixCode.Matrix (len(X), len(beta))
+> 
+>&emsp;	for i in range(0,len(X)):
+> 
+>&emsp;	&emsp;	m[i, 0] = X[i]
+> 
+>&emsp;&emsp;	m[i, 1] = 1
+> 
+>&emsp;	return m
+
+Then we can call the Levenberg-Marquardt algorithm
+
+> rrl.NonLinearRegression.non_linear_regression(X2, Y2, init, ctrl, res)
+
+and then print the result:
+> print("Slope")
+> 
+> print(res.beta[0])
+> 
+> print("Intercept")
+> 
+> print(res.beta[1])
+
+The class NonLinearRegression.control has various parameters that control the behavior of the Levenberg-Marquardt algorithm, among them are various
+conditions when the algorithm should stop (e.g. after some time, or after there is no improvement or after the error is below a certain margin). 
+They may be set as desired.
+
+Additionally, there are parameters that control the step size of the algorithm. These parameters have the same names as described at
+https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm and if not otherwise specified,
+defaults are used for them usually work.
+
+
+### Non-linear robust regression
+For non-linear curve fits the library also has the modified forward search/modified lts algorithm and the iterative outlier removal as for linear regression.
+For a modified forward search/lts algorithm with default parameters (S estimator, outlier_tolerance=3, loss function as least squares, 30% of the points are outliers at maximum), a call looks as follows:
+
+First the initialisation :
+> res=rrl.RobustRegression.nonlinear_algorithm_result()
+> 
+> ctrl=rrl.RobustRegression.modified_lts_control_nonlinear()
+> 
+> init=rrl.NonLinearRegression.initdata()
+> 
+> init.Jacobian=Jacobi
+> 
+> init.f=linear
+> 
+> init.initialguess = [1,1]
+
+Then the function call:
+> rrl.RobustRegression.modified_lts_regression_nonlinear(X2, Y2, init, ctrl, res)
+
+Finally, we print the result:
+> print("Slope")
+> 
+> print(res.beta[0])
+> 
+> print("Intercept")
+> 
+> print(res.beta[1])
+> 
+> print("\nOutlier indices")
+> 
+> for ind in res.indices_of_removedpoints:
+> 
+> &emsp;  print(ind)
+
+
+For the interative outlier removal algorithm, a call to the regression function with default parameters (S estimator, outlier_tolerance=3, loss function as least squares, 30% of the points are outliers at maximum) would look as follows:
+
+> res=rrl.RobustRegression.nonlinear_algorithm_result()
+> 
+> ctrl=rrl.RobustRegression.nonlinear_algorithm_control()
+> 
+> init=rrl.NonLinearRegression.initdata()
+> 
+> init.Jacobian=Jacobi
+> 
+> init.f=linear
+> 
+> init.initialguess = [1,1]
+
+> rrl.RobustRegression.iterative_outlier_removal_regression_nonlinear(X2, Y2, init, ctrl, res)
+
+
+
+## For the C++ language:
+
+In general, one has to include the library headers as follows:
+
+> #include "statisticfunctions.h"
+> 
+> #include "Matrixcode.h"
+> 
+> #include "linearregression.h"
+> 
+> #include "robustregression.h"
+> 
+> #include "nonlinearregression.h"
+> 
+> #include <valarray>
+
+### Simple Linear Regression
+The usage of the library in C++ is essentially similar as in python. the testapplication.cpp demonstrates the same function calls.
+The the X and Y data are stored in C++ valarrays. The control, result and initdata are not classes, but structs.
+
+For example, if we define some X,Y data:
+
+> valarray<double> X = { -3, 5,7, 10,13,16,20,22 };
+> 
+> valarray<double> Y = { -210, 430, 590,830,1070,1310,1630,1790 };
+
+and initialize the struct where we store the result,
+
+> Linear_Regression::result res;
+
+we can call a linear regression as follows:
+
+> Linear_Regression::linear_regression(X, Y, res);
+
+and we may print the result:
+
+> printf(" Slope ");
+> 
+> printf("%f", res.main_slope);
+> 
+> printf("\n Intercept ");
+> 
+> printf("%f", res.main_intercept);
+
+### Robust Regression methods
+
+Let us first define X and Y data with two outliers added.
+>	valarray<double> X2 = { -3, 5,7, 10,13,15,16,20,22,25 };
+>
+>	valarray<double> Y2 = { -210, 430, 590,830,1070,20,1310,1630,1790,-3 };
+
+#### Median Linear Regression: 
+Median regression is slower but more robust as simple linear regression.
+This command calls a robust curve fit with median regression
+
+> Linear_Regression::result res;
+> 
+> Linear_Regression::median_linear_regression(Xq, Y, res);
+
+and then we print the result
+
+> printf(" Slope ");
+> 
+> printf("%f", res.main_slope);
+> 
+> printf("\n Intercept ");
+> 
+> printf("%f", res.main_intercept);
+
+#### Modified forward search
+When many and large outliers are present, median regression does sometimes not deliver the desired results.
+
+The library therefore has the modified forward search/modified lts algorithm and the iterative outlier removal algorithm that can
+find outliers and remove them from the curve fit entirely.
+
+Below is a call for a robust modified forward search/modified lts algorithm initialized with default
+parameters:
+
+First the structs for controlling the algorithm and storing the results are initialised,
+
+> Robust_Regression::modified_lts_control_linear ctrl;
+> 
+> Robust_Regression::linear_algorithm_result res;
+
+Then, we call the functions for the curve fit:
+>	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res);
+
+Then we print the result:
+
+>	printf(" Slope ");
+>
+>	printf("%f", res.main_slope);
+>
+>	printf("\n Intercept ");
+>
+>	printf("%f", res.main_intercept);
+>
+>	printf("\n Indices of outliers ");
+>
+>	for (size_t i = 0; i < res.indices_of_removedpoints.size(); i++)
+>	{
+>	&emsp; 	size_t w = res.indices_of_removedpoints[i];
+>
+>	&emsp;	printf("%lu", (unsigned long)w);
+>
+>	&emsp;	printf(", ");
+>
+>	}
+
+
+The default parameters are as follows:
+
+The S estimator is used, outlier_tolerance=3,  30% of the pointnumber are outliers at maximum, loss function is given by least squares of the residuals.
+
+As in the python documentation, a point with residual err is then an outlier if 
+
+> |err-median(errs)/S_estimator>3
+
+where errs is the array of residuals.
+
+
+If the Q-estimator is used instead, the initialisation for the modified forward search/lts algorithm looks like
+
+>	Robust_Regression::modified_lts_control_linear ctrl;
+>
+>	Robust_Regression::linear_algorithm_result res;
+>
+>	ctrl.rejection_method = Robust_Regression::tolerance_is_decision_in_Q_ESTIMATION;
+
+Then we call the regression function:
+>	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res);
+
+If the interquartile range estimator should be used, so that a point is removed if it is below Q1 − outlier_tolerance* IQR or above Q3 + outlier_tolerance IQR, 
+we would have to set:
+
+> ctrl.rejection_method = Robust_Regression::tolerance_is_interquartile_range;
+
+For the interquartile range estimator, outlier_tolerance should be set to 1.5, so we additionally have to write:
+>	ctrl.outlier_tolerance = 1.5;
+
+before we call the regression function:
+>	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res);
+
+Similarly, some may prefer to set the outlier_tolerance parameter to 3.5 when the S,Q, or MAD or other estimators are used.
+
+
+#### Iterative outlier removal
+The modified forward search/modified lts algorithm can be slow since its complexity is given by the binomial coefficient of the pointnumber over the maximum
+number of outliers to be found. The iterative outlier removal algorithm is faster. It makes a curve fit of all points, then removes the outliers based on the 
+loss function and estimator and makes another curve fit and repeats the procedure until no outliers are found.
+
+A call to this method with the default parameters S estimator, outlier_tolerance=3, the loss function as least_squares and at most 30% of the points
+designated as outliers, would look as follows:
+
+>	Robust_Regression::linear_algorithm_result res;
+>
+>	Robust_Regression::linear_algorithm_control ctrl;
+>
+>	Robust_Regression::iterative_outlier_removal_regression_linear(X2, Y2, ctrl, res);
+
+### Non-linear Regression
+The non-linear curve fitting algorithm implements a Levenberg-Marquardt algorithm.
+
+For it to work, we must first supply initialisation data in form of a valarray of initial parameters beta,
+a function f(X,beta) to be found and a Jacobian J(X,beta).
+
+if we wanted to fit a line, we would have do define the function f(X,beta) to be fit
+
+> valarray<double> linear(const valarray<double>&X,const  valarray<double>& beta)
+> {
+> 
+>	&emsp;valarray<double> Y(X.size());
+> 
+>	&emsp;for (size_t i = 0; i < X.size(); i++)
+> 
+>	&emsp;&emsp;	Y[i] = beta[0] * X[i] + beta[1];
+> 
+>	&emsp;return Y;
+> 
+> }
+>
+
+and its Jacobian Matrix J(X,beta)
+> Matrix Jacobi(const valarray<double>& X, const  valarray<double>& beta)
+> {
+> 
+>	&emsp;Matrix ret(X.size(), beta.size());
+> 
+>	&emsp;for (size_t i = 0; i < X.size(); i++)
+> 
+>	&emsp;{
+> 
+>	&emsp;&emsp;	ret(i, 0) = X[i];
+> 
+>	&emsp;&emsp;	ret(i, 1) = 1;
+> 
+>	&emsp;}
+> 
+>	&emsp;return ret;
+> 
+> }
+
+A non-linear fit can the be initialised with default control parameters for the Levenberg-Marquardt algorithm like this:
+
+
+>	Non_Linear_Regression::result res;
+>
+>	Non_Linear_Regression::control ctrl;
+>
+>	Non_Linear_Regression::initdata init;
+>
+>	init.f = linear;
+>
+>	init.J = Jacobi;
+>
+>	valarray<double>beta = { 1,1 };
+>
+>	init.initialguess = beta;
+
+Then one can call the function:
+>	Non_Linear_Regression::non_linear_regression(X, Y, init, ctrl, res);
+
+Then we may print the result:
+
+>	printf("\n Slope ");
+>
+>	printf("%f", res.beta[0]);
+>
+>	printf("\n intercept ");
+>
+>	printf("%f", res.beta[1]);
+
+The struct Non_Linear_Regression::control has various control parameters that control the behavior of the Levenberg-Marquardt algorithm, among them are various
+conditions when the algorithm should stop (e.g. after some time, or after there is no improvement or after the error is below a certain margin).
+They may be set as desired.
+
+Additionally, there are parameters that control the step size of the algorithm. These parameters have the same names as described at
+https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm and if not otherwise specified,
+defaults are used for them  usually work.
+
+
+### Non-linear robust curve fits
+
+As for the linear regression, the library has the same modified forward search/lts and iterative outlier removal algorithms for the non-linear case
+
+For a modified forward search/lts algorithm, a call looks as follows:
+
+First the initialisation, here with default parameters for the algorithm control:
+
+> Robust_Regression::modified_lts_control_nonlinear ctrl;
+> 
+> Robust_Regression::nonlinear_algorithm_result res;
+> 
+> Non_Linear_Regression::initdata init;
+> 
+> init.f = linear;
+> 
+> init.J = Jacobi;
+> 
+> valarray<double>beta = { 1,1 };
+> 
+> init.initialguess = beta;
+
+Then the call:
+
+> Robust_Regression::modified_lts_regression_nonlinear(X2, Y2, init, ctrl, res);
+
+Then we print the result:
+> 	printf(" Slope ");
+> 
+>	printf("%f", res.beta[0]);
+> 
+>	printf("\n Intercept ");
+>
+>	printf("%f", res.beta[1]);
+> 
+>	printf("\n Indices of outliers ");
+>
+>	for (size_t i = 0; i < res.indices_of_removedpoints.size(); i++)
+>	{
+>		size_t w = res.indices_of_removedpoints[i];
+> 
+>  	printf("%lu", (unsigned long)w);
+>     printf(", ");
+> 
+>	}
+
+
+For the interative outlier removal algorithm, the call to the regression function would look as follows:
+First the initialisation, here again with default parameters for the algorithm control:
+
+> Non_Linear_Regression::initdata init;
+> 
+> Robust_Regression::nonlinear_algorithm_control ctrl;
+> 
+> init.f = linear;
+> 
+> init.J = Jacobi;
+> 
+> valarray<double>beta = { 1,1 };
+> 
+> init.initialguess = beta;
+
+Then the call,
+
+> Robust_Regression::iterative_outlier_removal_regression_nonlinear(X2, Y2, init, ctrl, res);
+
+The printing of the result would work similar as above.
+
+# Further documentation
 The library has an online repository at https://github.com/bschulz81/robustregression where the source code can be accessed. 
+
+The detailed documentation of all the various control parameters of the curve fiting algorithms is in the docstrings of the python module and in the c++ header file. 
+
+Also, the C++/python test applications in the folder testapp are documented and show many function calls
+
