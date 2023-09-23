@@ -24,14 +24,21 @@ SOFTWARE.
 from skbuild import setup # This line replaces 'from setuptools import setup'
 setup(
 name="pyRobustRegressionLib",
-version="1.2",
+version="1.2.1",
 description="A library that implements algorithms for linear and non-linear robust regression.",
-long_description="A library that implements algorithms for linear and non-linear robust regression. In addition to a module with robust regression algorithms, it contains a module with functions for ordinary linear and median regreession, a module with functions for non-linear regression, a module for statistical estimators and a module for simple Matrix and Vector calculations",
+long_description="""A library that implements algorithms for linear and non-linear robust regression. 
+In addition to a module with robust regression algorithms, it contains a module with functions for ordinary
+linear and median regreession, a module with functions for non-linear regression,
+a module for statistical estimators and a module for simple Matrix and Vector calculations""",
 author='Benjamin Schulz',
 license="MIT License",
 packages=['pyRobustRegressionLib'],
 python_requires=">=3.7",
 package_dir={"": "library\src"},
+keywords="""robust regression, forward-search, Huber\'s loss functtion, median regression, 
+simple linear regression, non-linear regression, Levenberg-Marquardt algorithm, 
+statistics, estimators,  S-estimator, Q-estimator, Student t-distribution,
+interquartile range, machine learning""",
 url='https://github.com/bschulz81/robustregression',
 classifiers=[
         "Programming Language :: C++",
