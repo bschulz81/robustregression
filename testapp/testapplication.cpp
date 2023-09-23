@@ -27,6 +27,7 @@ SOFTWARE.
 #include "linearregression.h"
 #include "robustregression.h"
 #include "nonlinearregression.h"
+#include "lossfunctions.h"
 
 #include <vector>
 
@@ -136,6 +137,7 @@ int main(int argc, char* argv[])
 	printf("%f", res4.main_intercept);
 
 	Robust_Regression::modified_lts_control_linear ctrl;
+	
 	Robust_Regression::linear_algorithm_result res5;
 	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res5);
 	printf("\n\n\nRobust regression with the same 2 inserted outliers\n");
@@ -150,8 +152,9 @@ int main(int argc, char* argv[])
 	Robust_Regression::modified_lts_control_linear ctrla;
 	Robust_Regression::linear_algorithm_result res5a;
 	ctrla.rejection_method = Robust_Regression::tolerance_is_decision_in_Q_ESTIMATION;
+	ctrla.lossfunction = LossFunctions::absolutevalue;
 	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrla, res5a);
-	printf("\n\n\nRobust regression with the same 2 inserted outliers, but now with the Q Estimator\n");
+	printf("\n\n\nRobust regression with the same 2 inserted outliers, but now with the Q Estimator and the loss function is the absolute value\n");
 	printf("\nModified last trimmed squares\n");
 	printf(" Slope ");
 	printf("%f", res5a.main_slope);
