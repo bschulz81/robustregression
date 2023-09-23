@@ -221,7 +221,7 @@ for ind in res4.indices_of_removedpoints:
 print("\n\nModified lts algorithm, but now instead of the default S estimator with the interquartile range method")
 ctrl4a= rrl.RobustRegression.modified_lts_control_linear()
 ctrl4a.outlier_tolerance=1.5;
-ctrl4a.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_interquartile_range;
+ctrl4a.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_interquartile_range
 res4a= rrl.RobustRegression.linear_algorithm_result()
 rrl.RobustRegression.modified_lts_regression_linear(X2, Y2, ctrl4a, res4a)
 
@@ -299,7 +299,7 @@ print("\n\n\nRobust non-linear regression with the same 2 inserted outliers\n")
 print("\nIterative outlier removal \n")
 
 res7=rrl.RobustRegression.nonlinear_algorithm_result() 
-ctrl7=rrl.RobustRegression.modified_lts_control_nonlinear()
+ctrl7=rrl.RobustRegression.nonlinear_algorithm_control()
 init7=rrl.NonLinearRegression.initdata() 
 init7.Jacobian=Jacobi
 init7.f=linear
