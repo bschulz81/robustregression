@@ -1,0 +1,10 @@
+include *.txt
+include *.md
+include License
+include testapp/*.txt
+include testapp/*.py
+include testapp/*.cpp
+include library/*.txt
+include library/src/*.cpp
+include library/include/*.h
+include library/src/pyRobustRegressionLib/*.cpp
