@@ -321,7 +321,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 								"parameter huberslossfunction_border can be set to specify the delta value after which loss(error) function will behave as "
 								" | error | instead of error ^ 2."
 								"The sub class error contains an array that contains the error computed by the loss function for each point divided by the number"
-								"of points, and the variable main_error, which contains a summ of all the errors per ";
+								"of points, and the variable main_error, which contains a sum of all the errors divided by the pointnumber";
 
 							py::class_< LossFunctions::error>(lossfunctions, "error")
 								.def(py::init<>())
