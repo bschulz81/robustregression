@@ -116,7 +116,7 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 	{
 	case Robust_Regression::tolerance_is_maximum_error:
 	{
-		double G = err * err;
+		double G = err;
 		if (G > Statisticfunctions::fabs(tolerance))
 		{
 			return true;
