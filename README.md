@@ -90,7 +90,7 @@ Module. The latter It can be loaded in python scripts with
 
 The command 
 
-> print(print(rrl.__doc__))
+> print(rrl.__doc__)
 
 Will list the sub-modules of the library, which are 
 
