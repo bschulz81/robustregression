@@ -78,7 +78,7 @@ only extremely simple datasets are tried out here that can be written down by ha
 
 print("\n 5!= ")
 print(rrl.StatisticFunctions.factorial(5))
-
+print(rrl.StatisticFunctions.__doc__)
 
 print("\nDefine some array and print it")
 X0=[3, 13, 7, 5, 21, 23, 39, 23, 40, 23, 14, 12, 56, 23]
