@@ -474,7 +474,7 @@ This command calls a robust curve fit with median regression
 
 > Linear_Regression::result res;
 > 
-> Linear_Regression::median_linear_regression(Xq, Y, res);
+> Linear_Regression::median_linear_regression(X2, Y2, res);
 
 and then we print the result
 
