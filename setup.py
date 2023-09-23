@@ -24,7 +24,7 @@ SOFTWARE.
 from skbuild import setup # This line replaces 'from setuptools import setup'
 setup(
 name="pyRobustRegressionLib",
-version="1.2.1",
+version="1.2",
 description="A library that implements algorithms for linear and non-linear robust regression.",
 long_description="""A library that implements algorithms for linear and non-linear robust regression. 
 In addition to a module with robust regression algorithms, it contains a module with functions for ordinary
