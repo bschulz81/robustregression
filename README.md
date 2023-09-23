@@ -118,7 +118,7 @@ which can be found in the /library/include directory.
 The header files can be found in the include subdirectory of the package.
 
 In the testapp folder, two example programs, one in python and one in C++ is provided.
-These test applications have extensive comments and call many functions of the librarym which show the basic usage. 
+These test applications have extensive comments and call many functions of the library in order to show the basic usage. 
 
 The curve fits that are done in the provided example programs are, however, very simple of course.
 This was done in order to keep the demonstration short and simple.
