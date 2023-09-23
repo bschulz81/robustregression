@@ -46,7 +46,7 @@ Some references are:
 7. Rousseeuw, P. J. (1984).Journal of the American Statistical Association. 79 (388): 871–880. doi:10.1080/01621459.1984.10477105. JSTOR 2288718.
    Rousseeuw, P. J.; Leroy, A. M. (2005) [1987]. Robust Regression and Outlier Detection. Wiley. doi:10.1002/0471725382. ISBN 978-0-471-85233-9, for the least trimmed squares algorithm
 8. Hadi and Simonoff, J. Amer. Statist. Assoc. 88 (1993) 1264-1272, Atkinson and Riani,Robust Diagnostic Regression Analysis (2000), Springer, for the forward search
-9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.) The versions of the S and Q estimators in this library are npw adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C. Especially for the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
+9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S and Q-estimators.) The versions of the S and Q estimators in this library are now adapted from the algorithms of Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in these algorithms, they were actually non-trivial to convert from Fortran to C. For the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
 
 # Compiling and Installing the library:
 
@@ -90,7 +90,7 @@ Module. The latter It can be loaded in python scripts with
 
 The command 
 
-> print(rrl.__doc__)
+> print(rrl.\__doc__)
 
 Will list the sub-modules of the library, which are 
 
@@ -101,16 +101,16 @@ Will list the sub-modules of the library, which are
 - RobustRegression
 
 And their docstrings can be called e.g. by
->print(rrl.*SubModuleName*.__doc__)
+>print(rrl.*SubModuleName*.\__doc__)
 
 e.g.
 
-> print(rrl.StatisticFunctions.__doc__).
+> print(rrl.StatisticFunctions.\__doc__).
 
 Will list the functions and classes of the sub-module StatisticFunctions. The free functions and classes all have more detailed doc
 strings that can be called as below for example
 
-> print (rrl.MatrixCode.Identity.__doc__)
+> print (rrl.MatrixCode.Identity.\__doc__)
 
 More convenient documentation is provided in the header files of the C++ source code of the package,
 which can be found in the /library/include directory.
