@@ -43,7 +43,7 @@ from   pyRobustRegressionLib import LinearRegression
 from   pyRobustRegressionLib import MatrixCode
 from   pyRobustRegressionLib import NonLinearRegression
 from   pyRobustRegressionLib import RobustRegression
-
+from   pyRobustRegressionLib import LossFunctions
 
 print("\nPrint the description of the sub-modules of pyRobustRegressionLib\n\n")
 print(print(rrl.__doc__))
@@ -205,6 +205,8 @@ print(res3.main_intercept)
 
 print("\n\nModified lts algorithm")
 ctrl4= rrl.RobustRegression.modified_lts_control_linear()
+
+
 res4= rrl.RobustRegression.linear_algorithm_result()
 rrl.RobustRegression.modified_lts_regression_linear(X2, Y2, ctrl4, res4)
 
@@ -218,9 +220,10 @@ for ind in res4.indices_of_removedpoints:
     print(ind)
 
 
-print("\n\nModified lts algorithm, but now instead of the default S estimator with the interquartile range method")
+print("\n\nModified lts algorithm, but now instead of the default S estimator with the interquartile range method and the loss function is the absolute value")
 ctrl4a= rrl.RobustRegression.modified_lts_control_linear()
 ctrl4a.outlier_tolerance=1.5;
+ctrl4a.lossfunction=rrl.LossFunctions.absolutevalue
 ctrl4a.rejection_method=rrl.RobustRegression.estimator_name.tolerance_is_interquartile_range
 res4a= rrl.RobustRegression.linear_algorithm_result()
 rrl.RobustRegression.modified_lts_regression_linear(X2, Y2, ctrl4a, res4a)
