@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 
 	Matrixcode::printvector(Matrixcode::Gaussian_algorithm(m, v));
 
-		printf("\nDefine some array ");
+	printf("\nDefine some array ");
 	valarray<double>X0 = { 3, 13, 7, 5, 21, 23, 39, 23, 40, 23, 14, 12, 56, 23 };
 	Matrixcode::printvector(Vector(X0));
 
@@ -198,7 +198,8 @@ int main(int argc, char* argv[])
 
 
 	Robust_Regression::linear_algorithm_result res6;
-	Robust_Regression::iterative_outlier_removal_regression_linear(X2, Y2, ctrl, res6);
+	Robust_Regression::linear_algorithm_control ctrl6;
+	Robust_Regression::iterative_outlier_removal_regression_linear(X2, Y2, ctrl6, res6);
 	printf(" Slope ");
 	printf("%f", res6.main_slope);
 	printf("\n intercept ");
@@ -272,9 +273,9 @@ int main(int argc, char* argv[])
 
 	
 	Robust_Regression::nonlinear_algorithm_result res10;
+	Robust_Regression::nonlinear_algorithm_control ctrl4;
 
-
-	Robust_Regression::iterative_outlier_removal_regression_nonlinear(X2, Y2, init, ctrl3, res10);
+	Robust_Regression::iterative_outlier_removal_regression_nonlinear(X2, Y2, init, ctrl4, res10);
 	printf(" Slope ");
 	printf("%f", res10.beta[0]);
 	printf("\n Intercept ");
