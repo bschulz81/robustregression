@@ -55,13 +55,10 @@ The Library needs CMake and a C compiler that is at least able to generate code 
 The library also makes use of OpenMP and needs Python in version 3 and pybind11 to compile. 
 
 
-
 Per default, the CMake variable $WithPython is ON. If one wants to use the python module one can compile and install the module by 
-going into the /source directory and then one can install it install with pip, i.e.
+with pip, i.e.
 
-cd /source
-
-pip install .
+> pip install .
 
 After that, the binary extension is copied into a path for python wheel extensions, where python scripts can find it.
 
@@ -70,7 +67,7 @@ In addition, a build directory should appear where the c++ testapplication can b
 one can uninstall the module by typing
 
 
-pip uninstall pyRobustRegressionLib
+> pip uninstall pyRobustRegressionLib
 
 
 
@@ -78,11 +75,55 @@ If one does not want the python module, one may set the cmake variable WithPytho
 
 One can compile the library also traditionally via CMake. Typing 
 
-CMake . 
+> CMake . 
 
-in the /source directory will generate the files necessary to compile the library, depending on the CMake generator set by the user.
+in the package directory will generate the files necessary to compile the library, depending on the CMake generator set by the user.
 
 After compilation, an out directory will appear with the library in binary form and the executable testapplication in c++. 
 If the variable WithPython was set to ON, one will also find a python module and a test script in python. 
 
+# Documentation of the library functions
+Documentation of the API is provided in C++ header files in the /library/include directory and the docstrings for the python module in the src/pyRobustRegressionLib
+Module. The latter It can be loaded in python scripts with 
 
+> import pyRobustRegressionLib as rrl
+
+The command 
+
+> print(print(rrl.__doc__))
+
+Will list the sub-modules of the library, which are 
+
+- StatisticFunctions, 
+- LinearRegression, 
+- MatrixCode, 
+- NonLinearRegression and 
+- RobustRegression
+
+And their docstrings can be called e.g. by
+>print(rrl.*SubModuleName*.__doc__)
+
+e.g.
+
+> print(rrl.StatisticFunctions.__doc__).
+
+Will list the functions and classes of the sub-module StatisticFunctions. The free functions and classes all have more detailed doc
+strings that can be called as below for example
+
+> print (rrl.MatrixCode.Identity.__doc__)
+
+More convenient documentation is provided in the header files of the C++ source code of the package,
+which can be found in the /library/include directory.
+
+The header files can be found in the include subdirectory of the package.
+
+In the testapp folder, two example programs, one in python and one in C++ is provided.
+These test applications have extensive comments and call many functions of the librarym which show the basic usage. 
+
+The curve fits that are done in the provided example programs are, however, very simple of course.
+This was done in order to keep the demonstration short and simple.
+The library is of course intended to be used with larger and much more complicated data.
+
+#
+
+The library has an online repository at https://github.com/bschulz81/robustregression where the source code can be accessed. 
