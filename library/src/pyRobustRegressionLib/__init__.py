@@ -26,3 +26,4 @@ from   pyRobustRegressionLib import LinearRegression
 from   pyRobustRegressionLib import MatrixCode
 from   pyRobustRegressionLib import NonLinearRegression
 from   pyRobustRegressionLib import RobustRegression
+from   pyRobustRegressionLib import LossFunctions
