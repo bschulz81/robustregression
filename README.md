@@ -104,6 +104,7 @@ Will list the sub-modules of the library, which are
 - MatrixCode, 
 - NonLinearRegression and 
 - RobustRegression
+- LossFunctions
 
 And their docstrings can be called e.g. by
 > print(rrl.*SubModuleName*.\_\_doc__)
@@ -256,6 +257,15 @@ If we do not change the loss function, least squares is used by default.
 > ctrl.outlier_tolerance=1.5
 
 before we call the regression function.
+
+Similarly, the loss function can be changed. For example, the absolute value of the residuals is usually more statistically robust than the square of the residuals
+
+> ctrl.lossfunction=rrl.LossFunctions.absolutevalue
+
+changes the lossfunction to the absolute value. 
+
+One can also specify Huber's loss function, but then one also has to supply a border parameter delta after which the
+function stops its err^2 behavior and turns into |err|.
 
 
 Note that the forward search can be very time consuming, as its performance is given by the binomial koefficient of the pointnumber over the maximum number of 
@@ -422,7 +432,7 @@ For the interative outlier removal algorithm, a call to the regression function 
 In general, one has to include the library headers as follows:
 
 > #include "statisticfunctions.h"
-> 
+>
 > #include "Matrixcode.h"
 > 
 > #include "linearregression.h"
@@ -430,7 +440,9 @@ In general, one has to include the library headers as follows:
 > #include "robustregression.h"
 > 
 > #include "nonlinearregression.h"
-> 
+>
+> #include "lossfunctions.h" 
+>
 > #include <valarray>
 
 ### Simple Linear Regression
@@ -561,6 +573,16 @@ before we call the regression function:
 >	Robust_Regression::modified_lts_regression_linear(X2, Y2, ctrl, res);
 
 Similarly, some may prefer to set the outlier_tolerance parameter to 3.5 when the S,Q, or MAD or other estimators are used.
+
+The loss function can also be changed. For example, the absolute value |err| of the residuals is usually more robust than the square err^2.
+The command
+
+> ctrl.lossfunction = LossFunctions::absolutevalue;
+
+changes the lossfunction to the absolute value. 
+
+One can also specify Huber's loss function, but then one also has to supply a border parameter delta after which the
+function stops its err^2 behavior and turns into |err|.
 
 
 #### Iterative outlier removal
