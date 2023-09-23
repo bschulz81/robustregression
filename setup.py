@@ -24,11 +24,28 @@ SOFTWARE.
 from skbuild import setup # This line replaces 'from setuptools import setup'
 setup(
 name="pyRobustRegressionLib",
-version="1.1",
-description="A library that implements algorithms for linear and non-linear robust regression. It also contains a module with functions for ordinary linear and median regreession, a module with functions for non-linear regression, a module for statistical estimators and a module for simple Matrix and Vector calculations",
+version="1.2",
+description="A library that implements algorithms for linear and non-linear robust regression.",
+long_description="A library that implements algorithms for linear and non-linear robust regression. It contains a module with functions for ordinary linear and median regreession, a module with functions for non-linear regression, a module for statistical estimators and a module for simple Matrix and Vector calculations",
 author='Benjamin Schulz',
-license="MIT",
+license="MIT License",
 packages=['pyRobustRegressionLib'],
 python_requires=">=3.7",
 package_dir={"": "library\src"},
+url='https://github.com/bschulz81/robustregression',
+classifiers=[
+        "Programming Language :: C++",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: Microsoft",
+        "Operating System :: POSIX",
+        "Operating System :: MacOS",
+        "Development Status :: 5 - Production/Stable",
+        "Topic :: Scientific/Engineering :: Mathematics",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: Education",
+        "Intended Audience :: Developers"
+    ]
 )
