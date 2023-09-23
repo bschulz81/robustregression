@@ -90,7 +90,7 @@ Module. The latter It can be loaded in python scripts with
 
 The command 
 
-> print(rrl.\__doc__)
+> print(rrl.\_\_doc__)
 
 Will list the sub-modules of the library, which are 
 
@@ -101,16 +101,16 @@ Will list the sub-modules of the library, which are
 - RobustRegression
 
 And their docstrings can be called e.g. by
->print(rrl.*SubModuleName*.\__doc__)
+>print(rrl.*SubModuleName*.\_\_doc__)
 
 e.g.
 
-> print(rrl.StatisticFunctions.\__doc__).
+> print(rrl.StatisticFunctions.\_\_doc__).
 
 Will list the functions and classes of the sub-module StatisticFunctions. The free functions and classes all have more detailed doc
 strings that can be called as below for example
 
-> print (rrl.MatrixCode.Identity.\__doc__)
+> print (rrl.MatrixCode.Identity.\_\_doc__)
 
 More convenient documentation is provided in the header files of the C++ source code of the package,
 which can be found in the /library/include directory.
