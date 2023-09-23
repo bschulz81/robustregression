@@ -20,16 +20,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from skbuild import setup 
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
-from skbuild import setup # This line replaces 'from setuptools import setup'
 setup(
 name="pyRobustRegressionLib",
-version="1.2",
+version="1.2.1",
 description="A library that implements algorithms for linear and non-linear robust regression.",
-long_description="""A library that implements algorithms for linear and non-linear robust regression. 
-In addition to a module with robust regression algorithms, it contains a module with functions for ordinary
-linear and median regreession, a module with functions for non-linear regression,
-a module for statistical estimators and a module for simple Matrix and Vector calculations""",
+long_description=long_description,
+long_description_content_type='text/markdown',
 author='Benjamin Schulz',
 license="MIT License",
 packages=['pyRobustRegressionLib'],
