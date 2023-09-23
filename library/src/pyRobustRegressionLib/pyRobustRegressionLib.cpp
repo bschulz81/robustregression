@@ -49,6 +49,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 		"classes for its initial and output data.\n\n The sub-module RobustRegression contains two different robust regression algorithms. Each of the algorithms "
 		"are implemented with one version vor linear and another version for non - linear regression.\n\n Classes that are used to control the behavior of the " 
 		"algorithms, as well as classes for the output data and the init data that must be specified for the non - linear regression algorithm are also provided";
+	
 	py::module Statisticfunctions = m.def_submodule("StatisticFunctions");
 
 	Statisticfunctions.def("factorial", &Statisticfunctions::factorial,
@@ -130,40 +131,40 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 		"Compute the Quartile Q3");
 
 	Statisticfunctions.doc() = "Contains a set of statistic functtions\n factorial:Computes the factorial n!\n\n stdeviation : Computes the standard deviation of an "
-								"array\n\n average : Computes the average of an array\n\n lowmedian : lowmedian\n\n t : "
-								"Computes the Student t distribution for a significance level alpha and an array of size nu from the algorithm "
-								"in Smiley W.Cheng, James C.Fu, Statistics& Probability Letters 1 (1983), 223 - 227\n\n crit : Computes the critical values "
-								"of the student t distribution for significance level alpha and an array of size N\n\n peirce : Computes the peirce criterium "
-								"from the point number, the number of outliers and the number of parameters to be fitted.\n see https "
-								"://en.wikipedia.org/wiki/Peirce%27s_criterion for an introduction and references to Peirce's original article in \n B. "
-								"Peirce  Astronomical Journal II 45 (1852) \n\n binomial:Computes the binomial coefficient n over k\n\n Q_estimator : Computes "
-								"the Q estimator of Croux and Rousseuuw for an array. \nThe estimator was published in \n Peter J.Rousseeuw, Christophe Croux, "
-								"Alternatives to the Median - Absolute Deviation\n J.of the Amer.Statistical Assoc. (Theory and Methods), 88 (1993), p. 1273, " 
-								"and \n Croux, C., Rousseeuw, P.J. (1992). Time - Efficient Algorithms for Two Highly Robust Estimators of Scale.\n In : Dodge, "
-								"Y., Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n https ://doi.org/10.1007/978-3-662-26811-7_58 \n\n"
-								"S_estimator: Computes the S estimator of Croux and Rousseuuw for an array. \nThe estimator was published in \n Peter J.Rousseeuw, "
-								"Christophe Croux, Alternatives to the Median - Absolute Deviation\n J.of the Amer.Statistical Assoc. (Theory and Methods), "
-								"88 (1993), p. 1273, and \n Croux, C., Rousseeuw, P.J. (1992).Time - Efficient Algorithms for Two Highly "
-								"Robust Estimators of Scale.\n In : Dodge, Y., Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n"
-								"https ://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.)\n The version of the S and Q estimator "
-								"in this library  are now adapted from Croux and Rousseeuw to the C language. \n Note that it is not the same Code because of some "
-								"optimizations. Since many variables act on array indices in this algorithm, \n it was actually non-trivial to convert from Fortran "
-								"to C.\n\n MAD_estimator:Computes the MAD estimator for an array.The correction coefficients were from Croux, "
-								"C., Rousseeuw, P.J. (1992), Time - Efficient Algorithms for Two Highly Robust Estimators 	of Scale.\n In : Dodge, Y., "
-								"Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n https ://doi.org/10.1007/978-3-662-26811-7_58 \n\n T_estimator: "
-								"Computes the Q estimator of Croux and Rousseuuw for an array. \nThe estimator was published in \n Peter J.Rousseeuw, "
-								"Christophe Croux, Alternatives to the Median - Absolute Deviation\n J.of the Amer.Statistical Assoc. (Theory and Methods), 88 "
-								"(1993), p. 1273, and \n Croux, C., Rousseeuw, P.J. (1992).Time - Efficient Algorithms for Two Highly Robust Estimators of "
-								" Scale.\n In : Dodge, Y., Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n "
-								"https ://doi.org/10.1007/978-3-662-26811-7_58 \n\n onestepbiweightmidvariance: Computes the biweight midvariance for one step for "
-								"an array.It expects the median m of the array.The estimator is described in \n T.C.Beers, K.Flynn and K.Gebhardt, "
-								"Astron.J. 100 (1), 32 (1990)\n\n fabs : Computes the absolute value of f\n\n median : Computes the median of an "
-								"array\n\n Q1 : Compute the Quartile Q1\n\n Q3 : Compute the Quartile Q3";
+				"array\n\n average : Computes the average of an array\n\n lowmedian : lowmedian\n\n t : "
+				"Computes the Student t distribution for a significance level alpha and an array of size nu from the algorithm "
+				"in Smiley W.Cheng, James C.Fu, Statistics& Probability Letters 1 (1983), 223 - 227\n\n crit : Computes the critical values "
+				"of the student t distribution for significance level alpha and an array of size N\n\n peirce : Computes the peirce criterium "
+				"from the point number, the number of outliers and the number of parameters to be fitted.\n see https "
+				"://en.wikipedia.org/wiki/Peirce%27s_criterion for an introduction and references to Peirce's original article in \n B. "
+				"Peirce  Astronomical Journal II 45 (1852) \n\n binomial:Computes the binomial coefficient n over k\n\n Q_estimator : Computes "
+				"the Q estimator of Croux and Rousseuuw for an array. \nThe estimator was published in \n Peter J.Rousseeuw, Christophe Croux, "
+				"Alternatives to the Median - Absolute Deviation\n J.of the Amer.Statistical Assoc. (Theory and Methods), 88 (1993), p. 1273, " 
+				"and \n Croux, C., Rousseeuw, P.J. (1992). Time - Efficient Algorithms for Two Highly Robust Estimators of Scale.\n In : Dodge, "
+				"Y., Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n https ://doi.org/10.1007/978-3-662-26811-7_58 \n\n"
+				"S_estimator: Computes the S estimator of Croux and Rousseuuw for an array. \nThe estimator was published in \n Peter J.Rousseeuw, "
+				"Christophe Croux, Alternatives to the Median - Absolute Deviation\n J.of the Amer.Statistical Assoc. (Theory and Methods), "
+				"88 (1993), p. 1273, and \n Croux, C., Rousseeuw, P.J. (1992).Time - Efficient Algorithms for Two Highly "
+				"Robust Estimators of Scale.\n In : Dodge, Y., Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n"
+				"https ://doi.org/10.1007/978-3-662-26811-7_58 (For the faster version of the S-estimator.)\n The version of the S and Q estimator "
+				"in this library  are now adapted from Croux and Rousseeuw to the C language. \n Note that it is not the same Code because of some "
+				"optimizations. Since many variables act on array indices in this algorithm, \n it was actually non-trivial to convert from Fortran "
+				"to C.\n\n MAD_estimator:Computes the MAD estimator for an array.The correction coefficients were from Croux, "
+				"C., Rousseeuw, P.J. (1992), Time - Efficient Algorithms for Two Highly Robust Estimators 	of Scale.\n In : Dodge, Y., "
+				"Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n https ://doi.org/10.1007/978-3-662-26811-7_58 \n\n T_estimator: "
+				"Computes the Q estimator of Croux and Rousseuuw for an array. \nThe estimator was published in \n Peter J.Rousseeuw, "
+				"Christophe Croux, Alternatives to the Median - Absolute Deviation\n J.of the Amer.Statistical Assoc. (Theory and Methods), 88 "
+				"(1993), p. 1273, and \n Croux, C., Rousseeuw, P.J. (1992).Time - Efficient Algorithms for Two Highly Robust Estimators of "
+				" Scale.\n In : Dodge, Y., Whittaker, J. (eds)Computational Statistics.Physica, Heidelberg.\n "
+				"https ://doi.org/10.1007/978-3-662-26811-7_58 \n\n onestepbiweightmidvariance: Computes the biweight midvariance for one step for "
+				"an array.It expects the median m of the array.The estimator is described in \n T.C.Beers, K.Flynn and K.Gebhardt, "
+				"Astron.J. 100 (1), 32 (1990)\n\n fabs : Computes the absolute value of f\n\n median : Computes the median of an "
+				"array\n\n Q1 : Compute the Quartile Q1\n\n Q3 : Compute the Quartile Q3";
 
 	py::module linearregression = m.def_submodule("LinearRegression");
 
 	linearregression.doc() = "Contains two functions, linear_regression and the more robust but slower median_linear_regression for linear curve fits. "
-							 "Both store their results for the main_slope and main_intercept in a struct called result";
+				"Both store their results for the main_slope and main_intercept in a struct called result";
 
 	py::class_<Linear_Regression::result>(linearregression, "result")
 		.def(py::init<>())
@@ -176,6 +177,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 
 		.doc()="Stores the result of the linear regression in the variables main_slope and main_intercept"
 		;
+	
 	linearregression.def("median_linear_regression", &Linear_Regression::median_linear_regression,
 		"computes a linear regression. datapoints are two valarrays x and y.the result is put into res.");
 
@@ -187,10 +189,10 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 	py::module matrixcode = m.def_submodule("MatrixCode");
 
 	matrixcode.doc() = "Contains two classes, Matrix and Vector. They are needed for the non-linear curve fitting algorithms and relatively basic, "
-						"but they can be converted easily to other python arrays.It also contains the functions; Identity, which yields an identity "
-						"matrix\n Transpose, which Yields the transpose of a matrix\nDiagonal, which yields the diagonal of a matrix, with all other "
-						"entries put to zero.\n	Gaussian_algorithm that expects a Matrix and a Vector or an array and returns a Vector or an Array that "
-						"is the result of the Gaussian algorithm.";
+			"but they can be converted easily to other python arrays.It also contains the functions; Identity, which yields an identity "
+			"matrix\n Transpose, which Yields the transpose of a matrix\nDiagonal, which yields the diagonal of a matrix, with all other "
+			"entries put to zero.\n	Gaussian_algorithm that expects a Matrix and a Vector or an array and returns a Vector or an Array that "
+			"is the result of the Gaussian algorithm.";
 
 	py::class_<Vector>(matrixcode, "Vector")
 		.def(py::init< valarray<double>>(), "Initializes a vector with elements set to the values of an array")
@@ -240,9 +242,9 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 	py::class_<Matrix>(matrixcode, "Matrix")
 
 		.def(py::init<const size_t, const  size_t, valarray<double>>(),"Constructs a Matrix with a given number of rows and columns, expects an array, "
-																		"MatrixCode.Matrix(3,3,[1,2,-1,1,1,-1,2,-1,1]) yields a Matrix with elements "
-																		"m3[0, 0] = 1, m3[0, 1] = 2,m3[0, 2] = -1,m3[1, 0] = 1,m3[1, 1] = 1,m3[1, 2] = -1, "
-																		"m3[2, 0] = 2,m3[2, 1] = -1,m3[2, 2] = 1")
+										"MatrixCode.Matrix(3,3,[1,2,-1,1,1,-1,2,-1,1]) yields a Matrix with elements "
+										"m3[0, 0] = 1, m3[0, 1] = 2,m3[0, 2] = -1,m3[1, 0] = 1,m3[1, 1] = 1,m3[1, 2] = -1, "
+										"m3[2, 0] = 2,m3[2, 1] = -1,m3[2, 2] = 1")
 
 		.def(py::init<const size_t, const size_t>(), "constructs a Matrix with a given number of rows and columns, with elements set to 0")
 
@@ -316,36 +318,41 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 								"properties, control determines the algorithm behavior. The functions non_linear_regression make a non-linear curve "
 								"fit with a Levenberg-Marquardt algorithm according to  https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm, the "
 								"function  nonlinear_loss_function computes the residuals by some specified metric";
+
+	
 	py::class_< Non_Linear_Regression::initdata>(nonlinearregression, "initdata")
 		.def(py::init<>())
+		
 		.def_readwrite("initialguess", &Non_Linear_Regression::initdata::initialguess, "Contains an array that represents the initial data for the non-linear fit")
 
 		.def_readwrite("Jacobian", &Non_Linear_Regression::initdata::J, "Contains the Jacobi Matrix of the function f(X,beta) whose parameters beta are to be "
-																		"found and fitted to data X and Y.For example, for a linear function, the Jacobi Matrix is "
-																		"given by : def Jacobi(X, beta) : \n Matrix(len(X), len(beta)) \n	for i in "
-																		"range(0, len(X)) :\n m[i, 0] = X[i]\n	m[i, 1] = 1\n return m")
+										"found and fitted to data X and Y.For example, for a linear function, the Jacobi Matrix is "
+										"given by : def Jacobi(X, beta) : \n Matrix(len(X), len(beta)) \n	for i in "
+										"range(0, len(X)) :\n m[i, 0] = X[i]\n	m[i, 1] = 1\n return m")
 
 		.def_readwrite("f", &Non_Linear_Regression::initdata::f, "Contains the function f(X,beta) whose parameters beta are to be found and fitted to data X and Y. "
-																"For example, for a linear function, f is given by : def linear(X, beta) : \n Y = []\n for i in "
-																"range(0, len(X)) :\n	Y.append(beta[0] * X[i] + beta[1])\n return Y ")
+									"For example, for a linear function, f is given by : def linear(X, beta) : \n Y = []\n for i in "
+									"range(0, len(X)) :\n	Y.append(beta[0] * X[i] + beta[1])\n return Y ")
 
 		.doc()="Contains the initialisation data for the non-linear regression algorithms. An array called initialguess, a pointer to a Matrix function called "
 		"Jacobian(X, beta), and a pointer to the function f(X, beta), where X is an array on the X axis and beta is an array for the parameters of f to be found in "
 		"the curve fit"
 		;
+	
 	py::class_< LossFunctions::error>(nonlinearregression, "error")
 		.def(py::init<>())
 
 		.def_readwrite("errorarray", &LossFunctions::error::errorarray, "Contains an array of the residuals, computed with respect to some metric, e.g. "
-																		"the squared differences, the absolute value of the differences, or Huber's loss function, "
-																		"between each data point, and the fitted function")
+										"the squared differences, the absolute value of the differences, or Huber's loss function, "
+										"between each data point, and the fitted function")
 
 		.def_readwrite("main_error", &LossFunctions::error::main_error, "Contains a measure for the entire error of the fit with respect to the data, with respect "
-																		"to some metric, e.g the absolute values, the squared residuals or Huber's loss function")
+										"to some metric, e.g the absolute values, the squared residuals or Huber's loss function")
 
 		.doc()="Contains the residuals of the curve fit, as calculated by some metric. The residuals for each point are in errorarray, "
 				"the entire residual is in main_error"
 		;
+	
 	py::class_< Non_Linear_Regression::result>(nonlinearregression, "result")
 		.def(py::init<>())
 
@@ -367,7 +374,6 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 		.export_values()
 		;
 
-
 	py::class_< LossFunctions::errorfunction>(nonlinearregression, "errorfunction")
 		.def(py::init<>())
 		.def_readwrite("lossfunction", &LossFunctions::errorfunction::lossfunction, 
@@ -377,12 +383,13 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 			"If Huber's loss function is used, this determines its borders delta")
 
 		.doc()="Describes the metric how errors are computed. the field lossfunction describes the name of the metric for the errors. It can be  huberlossfunction, "
-				"squaredresidual or absolutevalue. If Huber's loss function is chosen, the field huberslossfunction_border describes the delta parameter "
+			"squaredresidual or absolutevalue. If Huber's loss function is chosen, the field huberslossfunction_border describes the delta parameter "
 		      "of the loss function "
 		;
 
 	py::class_< Non_Linear_Regression::control, LossFunctions::errorfunction>(nonlinearregression, "control")
 		.def(py::init<>())
+		
 		.def_readwrite("lambda", &Non_Linear_Regression::control::lambda,
 			"The Lambda parameter for the Levenberg-Marquardt algorithm, see "
 			"https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm . Usually the provideddefault works")
@@ -412,7 +419,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 			"Sets a tolerable error after which the iteration of the Levenberg-Marquardt algorithm stops")
 
 		.doc()="Describes the parameters of the Levenberg-Marquardt algorithm with fields lambda, increlemt, decrement,h which are similar as in "
-			 "https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm additionally, it has the fields precision, which stop the algorithm after "
+			"https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm additionally, it has the fields precision, which stop the algorithm after "
 			"its improval is only increased in an iteration by a margin smaller than precision,  stop_nonlinear_curve_fitting_after_iterations "
 			"which stop the algorithm after a given number of iterations, stop_nonlinear_curve_fitting_after_seconds, which stops the algorithm "
 			"after a given time and	tolerable_error, which stops the algorithm once the error is deemed small enough by the given margin"
@@ -429,30 +436,30 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 
 	py::module robustregression = m.def_submodule("RobustRegression");
 	robustregression.doc() = "contains several classes needed for the initialisation and control of various robust regression algorithms\n The robust regression "
-							"algorithms in the module are divided into linear and non-linear robust regression algorithms\n	modified_lts_regression_linear "
-							"is a modified forward search algorithm.A subset of k points of the n points is chosen.A linear regression is made with the k "
-							"points.Then, it is computed whether\n	the other n - k points are outliers by a specified robust estimator.If not, "
-							"they are added to the fit and a new linear regression is made.Then a different set of k points is chosen and the procedure "
-							"is repeated until the best model is found.\n	The function iterative_outlier_removal_regression_linear uses a specified robust "
-							"estimator to find whether a point is an outlier based on its residual.Then, the point is removed and another\n	linear curve fit "
-							"is made.This is done, until there are no outliers anymore in the data.\nThe functions modified_lts_regression_nonlinear and "
-							"iterative_outlier_removal_regression_nonlinear implement the same robust algorithms for non - linear curve fits.\n	The function "
-							"linear_loss_function computes the loss function for the curve fit and the data based on some metric, which can be squared residuals, "
-							"absulute values of the residuals or Huber's loss function. \n	In order to control the algorithm, the module has various "
-							"classes.\nmodified_lts_control_nonlinear and modified_lts_control_linear are used to control the non - linear and linear algorithms "
-							"based on the forward search.\n	nonlinear_algorithm_control and linear_algorithm_control control the behaviors of the non - linear and "
-							"linear iterative outlier removal algorithms.\n	nonlinear_algorithm_result and linear_algorithm_result are used to store the result of "
-							"the non - linear and linear curve fitting algorithms\n	The non - linear regression algorithms also need the initdata class provided "
-							"by the NonLinearRegression module\nThe classes contain several subclasses.  \n	For example, linear_algorithm_result and "
-							"nonlinear_algorithm_result inherit the result class from the NonLinearRegression and LinearRegression	module, but also a class "
-							"RobustRegression, which contains the indices of the poihts that are rejected and used by the curve fits the classes "
-							"linear_algorithm_control inherits the class control which determines the robust estimators that are used for outlier detection. "
-							"additionally  linear_algorithm_control inherits the class errorfunction, which determines the loss function used in the curve fit. "
-							"\n	the classes nonlinear_algorithm_control inherits the class control which determines the robust estimators that are used for outlier "
-							"detection.\nAdditionally  nonlinear_algorithm_control inherits the class control from the non - linear - regression module, "
-							"which determines how the non - linear algorithm behaves\n the clases modified_lts_control_linear inherits linear_algorithm_control "
-							"and modified_lts_control_nonlinear inherits the class nonlinear_algorithm_control but both classes also inherit the class\n "
-							"lts_control which determines whether a ransac should be used or how much workload should be distributed to a thread.";
+				"algorithms in the module are divided into linear and non-linear robust regression algorithms\n	modified_lts_regression_linear "
+				"is a modified forward search algorithm.A subset of k points of the n points is chosen.A linear regression is made with the k "
+				"points.Then, it is computed whether\n	the other n - k points are outliers by a specified robust estimator.If not, "
+				"they are added to the fit and a new linear regression is made.Then a different set of k points is chosen and the procedure "
+				"is repeated until the best model is found.\n	The function iterative_outlier_removal_regression_linear uses a specified robust "
+				"estimator to find whether a point is an outlier based on its residual.Then, the point is removed and another\n	linear curve fit "
+				"is made.This is done, until there are no outliers anymore in the data.\nThe functions modified_lts_regression_nonlinear and "
+				"iterative_outlier_removal_regression_nonlinear implement the same robust algorithms for non - linear curve fits.\n	The function "
+				"linear_loss_function computes the loss function for the curve fit and the data based on some metric, which can be squared residuals, "
+				"absulute values of the residuals or Huber's loss function. \n	In order to control the algorithm, the module has various "
+				"classes.\nmodified_lts_control_nonlinear and modified_lts_control_linear are used to control the non - linear and linear algorithms "
+				"based on the forward search.\n	nonlinear_algorithm_control and linear_algorithm_control control the behaviors of the non - linear and "
+				"linear iterative outlier removal algorithms.\n	nonlinear_algorithm_result and linear_algorithm_result are used to store the result of "
+				"the non - linear and linear curve fitting algorithms\n	The non - linear regression algorithms also need the initdata class provided "
+				"by the NonLinearRegression module\nThe classes contain several subclasses.  \n	For example, linear_algorithm_result and "
+				"nonlinear_algorithm_result inherit the result class from the NonLinearRegression and LinearRegression	module, but also a class "
+				"RobustRegression, which contains the indices of the poihts that are rejected and used by the curve fits the classes "
+				"linear_algorithm_control inherits the class control which determines the robust estimators that are used for outlier detection. "
+				"additionally  linear_algorithm_control inherits the class errorfunction, which determines the loss function used in the curve fit. "
+				"\n	the classes nonlinear_algorithm_control inherits the class control which determines the robust estimators that are used for outlier "
+				"detection.\nAdditionally  nonlinear_algorithm_control inherits the class control from the non - linear - regression module, "
+				"which determines how the non - linear algorithm behaves\n the clases modified_lts_control_linear inherits linear_algorithm_control "
+				"and modified_lts_control_nonlinear inherits the class nonlinear_algorithm_control but both classes also inherit the class\n "
+				"lts_control which determines whether a ransac should be used or how much workload should be distributed to a thread.";
 
 	py::class_< Robust_Regression::result, LossFunctions::error>(robustregression, "result")
 		.def(py::init<>())
@@ -464,7 +471,7 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 			"Contains an array with the indices of the points that were used by the robust fit")
 
 		.doc()="Describes the result from the robust procedures in terms of errorfunctions and removal of points.\n Inherits from LossFunctions::error \n The field "
-				"indices_of_removedpoints Stores the indices of the removed points and indices_of_used_points stores the points that were used in the robust curve fits"
+			"indices_of_removedpoints Stores the indices of the removed points and indices_of_used_points stores the points that were used in the robust curve fits"
 		;
 
 	py::class_< Robust_Regression::linear_algorithm_result, Robust_Regression::result,Linear_Regression::result>(robustregression,
@@ -527,8 +534,6 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 			"by some metric, i.e. the absolute value of the residuals, the squared residuals or Huber's loss function.")
 		.export_values()
 		;
-
-
 
 	py::class_< Robust_Regression::control>(robustregression, "control")
 		.def(py::init<>())
@@ -606,7 +611,6 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 		.doc()="Controls the behavior of the non-linear forward search algorithms. Inherits from  Robust_Regression::modified_lts_control_nonlinear, "
 		"Robust_Regression::nonlinear_algorithm_control, Robust_Regression::lts_control"
 		;
-
 
 	robustregression.def("modified_lts_regression_linear", &Robust_Regression::modified_lts_regression_linear,
 		"Implements a modified least trimmed squares algorithm.\n"
