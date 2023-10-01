@@ -77,7 +77,7 @@ in the package directory will generate the files necessary to compile the librar
 
 Under Linux, the command
 
-> make .
+> make 
 
 will then compile the library.
 
