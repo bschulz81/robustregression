@@ -42,10 +42,14 @@ namespace Linear_Regression
 	
 
 
-	// computes a linear regression. datapoints are two valarrays x and y. the result is put into res.
+	// computes a simple linear regression. datapoints are given by two valarrays x and y. the result is put into res.
 	ROBUSTREGRESSION_API bool linear_regression(const valarray<double>& x, const valarray<double>& y, Linear_Regression::result& res);
 
-	// computes a median linear regression, which is more robust against outliers. Parameters are similar as in the linear regression.
-	// It is slower than linear regression and for large and many outliers, it also does not yield precise results.
-	ROBUSTREGRESSION_API bool median_linear_regression(const valarray<double>&x,const  valarray<double>&y, Linear_Regression::result&res);
+	// computes Siegel's repeated median linear regression, which is more robust against outliers.
+	// Datapoints are given by two valarrays x and y. the result is put into res. For a documentation of the algorithm, see
+	// Andrew F.Siegel.Robust regression using repeated medians.Bionaetrika, 69(1) : 242–244, 1982,
+	// Andrew Stein and Michael Werman. 1992. Finding the repeated median regression line.In 
+	// Proceedings of the third annual ACM - SIAM symposium on Discrete algorithms(SODA '92). Society for Industrial and Applied Mathematics, USA, 409–413.
+	// https://dl.acm.org/doi/10.5555/139404.139485 Note that a comparably slow algorithm is used in the current implementation of the library.
+	ROBUSTREGRESSION_API  bool median_linear_regression(const valarray<double>&x,const  valarray<double>&y, Linear_Regression::result&res);
 }
