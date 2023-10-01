@@ -60,12 +60,12 @@ The library also makes use of OpenMP and needs Python in version 3 and pybind11 
 
 By default, the library also containts two test applications. 
 
-If the variable $WITH_TESTAPP, a c++ test application is compiled and put in an /output directory. 
+If the variable $WITH_TESTAPP is set to ON, a c++ test application is compiled and put in an /output directory. 
 
-The library also shipps with a Python module. By default, the CMake variable $WithPython is ON and a Python module will
+The library also shipps with a Python module. By default, the CMake variable $With_Python is set to ON and a Python module will
 be generated in addition to a c++ library.
 
-If $WITH_TESTAPP and $WithPython are set, which is the default, then a Python test application will be generated in addition to
+If $WITH_TESTAPP and $With_Python are set, which is the default, then a Python test application will be generated in addition to
 the C++ test application.
 
 ## Installing with CMake
@@ -87,16 +87,16 @@ By default, the library also containts two test applications.
 If the variable $WITH_TESTAPP is set, a c++ test application is compiled and put in an /output directory. 
 
 The library also ships with a Python module. By default, the CMake variable $With_Python is ON and a Python module will
-be generated in addition to a c++ library.
+be generated in addition to a c++ library and copied into the /output directory.
 
 If $WITH_TESTAPP and $With_Python are set to ON, which is the default, then a Python test application will be generated and compiled into the /output directory.
 
-By compiling with CMake, the Python module is, just compiled into the /output directory. It is not installed in a path for system libraries
+By compiling with CMake, the Python module is just compiled into the /output directory. It is not installed in a path for system libraries
 or python packages. So if one wants to use the Python module, one has either a) to write the script in the same folder where the module is, or b) load
 it by pointing Python to the explicit path of the module, or c) copy the module to a place where Python can find it.
 
 
-If one does not want the Python module to be compiled, one may set the cmake variable With_Python to OFF.
+If one does not want the Python module to be compiled, one may set the cmake variable $With_Python to OFF.
 
 ## Installing with PIP (This option is mostly for Windows since Linux distributions have their own package managers)
 
@@ -112,14 +112,14 @@ After that, the module is compiled and the binaries are copied into a path for P
 This is successfull on Windows.
 
 Unfortunately, problems to find the module remain on Linux.
-If pip is called by the  root user, the module is copied into the /usr/lib directory. Despite this,  python scripts have difficulties to load the module. 
-If one does not install the module as root user, pip will install it in a local site-package directory, where python also has problems to find the module.
+If pip is called by the  root user, the module is copied into the /usr/lib directory. Despite this,  python scripts have difficulties to load the module if they do not use a hardcoded import path. 
+If one does not install the module as root user, pip will install it in a local site-package directory, where python also has problems to find the module without a hard coded import path.
 
 If the module was compiled by pip, one can uninstall it by typing
 
 > pip uninstall pyRobustRegressionLib
 
-Under Linux, compiling with cmake should be preferred. Not at least because linux package managers (e.g. emerge) sometimes have conflicts with pip.
+Under Linux, compiling with cmake should be preferred. Not at least because linux package managers (e.g. portage from gentoo) sometimes have conflicts with pip.
 
 Additionally, the python environment will select ninja as a default generator, which will require to clean the build files
 if an earlier generation based on cmake was done that may have used a different generator.
