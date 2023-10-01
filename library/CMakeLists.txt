@@ -1,15 +1,19 @@
 
 include(GenerateExportHeader)
 
-set(sources  ${CMAKE_CURRENT_SOURCE_DIR}/src/linearregression.cpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/matrixcode.cpp 
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/robustregression.cpp 
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/statisticfunctions.cpp 
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/nonlinearregression.cpp)
+set (librarydir ${CMAKE_CURRENT_SOURCE_DIR})
+set (librarysourcedir ${librarydir}/src)
+set (libraryincludedir ${librarydir}/include)
 
-ADD_LIBRARY(RobustRegressionLib SHARED ${sources})
+set(sourceslibrary  ${librarysourcedir}/linearregression.cpp
+             ${librarysourcedir}/matrixcode.cpp 
+             ${librarysourcedir}/robustregression.cpp 
+             ${librarysourcedir}/statisticfunctions.cpp 
+             ${librarysourcedir}/nonlinearregression.cpp)
 
-target_include_directories(RobustRegressionLib PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include" ${CMAKE_CURRENT_BINARY_DIR})
+ADD_LIBRARY(RobustRegressionLib SHARED ${sourceslibrary})
+
+target_include_directories(RobustRegressionLib PUBLIC  ${libraryincludedir} ${CMAKE_CURRENT_BINARY_DIR})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOSX TRUE)
@@ -43,17 +47,16 @@ GENERATE_EXPORT_HEADER(RobustRegressionLib
     EXPORT_FILE_NAME robustregressionlib_exports.h
     STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
 
-
 if(${WITH_PYTHON})
-
+    set (librarypythondir ${librarysourcedir}/pyRobustRegressionLib)
     find_package(Python3 COMPONENTS Interpreter Development)  
     find_package(pybind11 CONFIG REQUIRED )
 
     set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_DEBUG ";RELEASE")
 
-    pybind11_add_module(pyRobustRegressionLib ${CMAKE_CURRENT_SOURCE_DIR}/src/pyRobustRegressionLib/pyRobustRegressionLib.cpp)
+    pybind11_add_module(pyRobustRegressionLib ${librarypythondir}/pyRobustRegressionLib.cpp)
 
-    target_include_directories(pyRobustRegressionLib PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include" ${CMAKE_CURRENT_BINARY_DIR})
+    target_include_directories(pyRobustRegressionLib PUBLIC ${libraryincludedir} ${CMAKE_CURRENT_BINARY_DIR})
 
 
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -83,8 +86,11 @@ if(${WITH_PYTHON})
    target_link_libraries(pyRobustRegressionLib PUBLIC RobustRegressionLib)
 
    if(DEFINED SKBUILD)
-        install(TARGETS RobustRegressionLib DESTINATION .)
-        install(TARGETS pyRobustRegressionLib DESTINATION .)
+        install(TARGETS RobustRegressionLib DESTINATION lib)
+        install(TARGETS pyRobustRegressionLib DESTINATION lib)
     endif()
+
 endif()
+
+
 
