@@ -1,4 +1,4 @@
-# robustregression
+# RobustregressionLib
 This is a c++ library with statistical machine learning algorithms for linear and non-linear robust regression.
 
 It implements the statistical algorithms that were originally developed by the author for an autofocus application for telescopes
@@ -8,13 +8,13 @@ and published in 	arXiv:2201.12466 [astro-ph.IM], https://doi.org/10.1093/mnras/
 In addition to these, two other robust algorithms were added and the curve fitting library has been brought into a form of a
 clear and simply API that can be easily used for very broad and general applications.
 
-The library offers python bindings for most functions. So the programmer has the choice between c++ and python. In order to 
-compile the library with python bindings Pybind11 and Python3 should be installed and be found by CMake. 
+The library offers Python bindings for most functions. So the programmer has the choice between c++ and Python. In order to 
+compile the library with Python bindings Pybind11 and Python3 should be installed and be found by CMake. 
 Otherwise, only the C++ standard template library is used, together with OpenMP. 
 
-The documentation of the functions that the library uses are written in the C++header files and in the __doc__ methods of the python bindings.
+The documentation of the functions that the library uses are written in the C++header files and in the __doc__ methods of the Python bindings.
 
-In addition, a c++ application and a python script is provided that show the functions of the library with very simple data.
+In addition, a c++ application and a Python script is provided that show the functions of the library with very simple data.
 
 The Library is released under MIT License.
 
@@ -47,49 +47,91 @@ Some references are:
    Rousseeuw, P. J.; Leroy, A. M. (2005) [1987]. Robust Regression and Outlier Detection. Wiley. doi:10.1002/0471725382. ISBN 978-0-471-85233-9, for the least trimmed squares algorithm
 8. Hadi and Simonoff, J. Amer. Statist. Assoc. 88 (1993) 1264-1272, Atkinson and Riani,Robust Diagnostic Regression Analysis (2000), Springer, for the forward search
 9. Croux, C., Rousseeuw, P.J. (1992). Time-Efficient Algorithms for Two Highly Robust Estimators of Scale. In: Dodge, Y., Whittaker, J. (eds) Computational Statistics. Physica, Heidelberg. https://doi.org/10.1007/978-3-662-26811-7_58 
-1. (For the faster version of the S and Q estimators.) The versions of the S and Q estimators in this library are now adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C. Especially for the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
+ (For the faster version of the S and Q estimators.) The versions of the S and Q estimators in this library are now adapted from Croux and Rousseeuw to the C language. Note that it is not the same Code because of some optimizations. Since many variables act on array indices in this algorithm, it was actually non-trivial to convert from Fortran to C. Especially for the Q estimator, the naive algorithm is faster for less than 100 datapoints. For the S estimator this is the case for less than 10 datapoints. Therefore, in these cases the naive versions are still used.
+10. Andrew F. Siegel. Robust regression using repeated medians. Bionaetrika, 69(1):242–244, 1982,Andrew Stein and Michael Werman. 1992. Finding the repeated median regression line. In Proceedings of the third annual ACM-SIAM symposium on Discrete algorithms (SODA '92). Society for Industrial and Applied Mathematics, USA, 409–413. https://dl.acm.org/doi/10.5555/139404.139485
 
 # Compiling and Installing the library:
 
-The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard (per default, if one does not use Clang or MacOs, it uses C17, but with a CXX_STANDARD 14 switch set in the CMakeLists.txt for the library, it can use C14, which is the the default for Clang and MacOS.) 
+The Library needs CMake and a C compiler that is at least able to generate code according to the C14 standard
+(per default, if one does not use Clang or MacOs, it uses C17, but with a CXX_STANDARD 14 switch set in the 
+CMakeLists.txt for the library, it can use C14, which is the the default for Clang and MacOS.) 
 
 The library also makes use of OpenMP and needs Python in version 3 and pybind11 to compile. 
 
+By default, the library also containts two test applications. 
 
-Per default, the CMake variable $WithPython is ON. If one wants to use the python module one can compile and install the module by 
-with pip, i.e. by typinh
+If the variable $WITH_TESTAPP, a c++ test application is compiled and put in an /output directory. 
 
-> pip install .
+The library also shipps with a Python module. By default, the CMake variable $WithPython is ON and a Python module will
+be generated in addition to a c++ library.
 
-in the package directory. After that, the binary extension is copied into a path for python wheel extensions, where python scripts can find it.
+If $WITH_TESTAPP and $WithPython are set, which is the default, then a Python test application will be generated in addition to
+the C++ test application.
 
-In addition, a build directory should appear where the c++ testapplication can be found together with a binary.
-
-one can uninstall the module by typing
-
-
-> pip uninstall pyRobustRegressionLib
-
-
-
-If one does not want the python module, one may set the cmake variable WithPython to OFF.
-
+## Installing with CMake
 One can compile the library also traditionally via CMake. Typing 
 
-> CMake . 
+> cmake . 
 
 in the package directory will generate the files necessary to compile the library, depending on the CMake generator set by the user.
 
-After compilation, an out directory will appear with the library in binary form and the executable testapplication in c++. 
-If the variable WithPython was set to ON, one will also find a python module and a test script in python. 
+Under Linux, the command
+
+> make .
+
+will then compile the library.
+
+After compilation, an /output directory will appear with the library in binary form. 
+By default, the library also containts two test applications. 
+
+If the variable $WITH_TESTAPP is set, a c++ test application is compiled and put in an /output directory. 
+
+The library also ships with a Python module. By default, the CMake variable $With_Python is ON and a Python module will
+be generated in addition to a c++ library.
+
+If $WITH_TESTAPP and $With_Python are set to ON, which is the default, then a Python test application will be generated and compiled into the /output directory.
+
+By compiling with CMake, the Python module is, just compiled into the /output directory. It is not installed in a path for system libraries
+or python packages. So if one wants to use the Python module, one has either a) to write the script in the same folder where the module is, or b) load
+it by pointing Python to the explicit path of the module, or c) copy the module to a place where Python can find it.
+
+
+If one does not want the Python module to be compiled, one may set the cmake variable With_Python to OFF.
+
+## Installing with PIP (This option is mostly for Windows since Linux distributions have their own package managers)
+
+If one wants that the module is installed into a library path, where Python scripts may be able to find it easily, one can compile and install the module also 
+with pip instead of CMake by typing
+
+> pip install .
+
+in the package directory. 
+
+After that, the module is compiled and the binaries are copied into a path for Python site-packages, where Python scripts should be able to find it.
+
+This is successfull on Windows.
+
+Unfortunately, problems to find the module remain on Linux.
+If pip is called by the  root user, the module is copied into the /usr/lib directory. Despite this,  python scripts have difficulties to load the module. 
+If one does not install the module as root user, pip will install it in a local site-package directory, where python also has problems to find the module.
+
+If the module was compiled by pip, one can uninstall it by typing
+
+> pip uninstall pyRobustRegressionLib
+
+Under Linux, compiling with cmake should be preferred. Not at least because linux package managers (e.g. emerge) sometimes have conflicts with pip.
+
+Additionally, the python environment will select ninja as a default generator, which will require to clean the build files
+if an earlier generation based on cmake was done that may have used a different generator.
+
 
 # Documentation of the library functions
 
 ## For the Python language
 
 ### Calling the documentation
-Documentation of the API is provided in C++ header files in the /library/include directory and the docstrings for the python module in the src/pyRobustRegressionLib
-Module. The latter It can be loaded in python scripts with 
+Documentation of the API is provided in C++ header files in the /library/include directory and the docstrings for the Python module in the src/pyRobustRegressionLib
+Module. The latter It can be loaded in Python scripts with 
 
 > import pyRobustRegressionLib as rrl
 
@@ -123,7 +165,7 @@ which can be found in the /library/include directory.
 
 The header files can be found in the include subdirectory of the package.
 
-In the testapp folder, two example programs, one in python and one in C++ is provided.
+In the testapp folder, two example programs, one in Python and one in C++ is provided.
 These test applications have extensive comments and call many functions of the librarym which show the basic usage. 
 
 The curve fits that are done in the provided example programs are, however, very simple of course.
@@ -264,8 +306,27 @@ Similarly, the loss function can be changed. For example, the absolute value of 
 
 changes the lossfunction to the absolute value. 
 
-One can also specify Huber's loss function, but then one also has to supply a border parameter delta after which the
-function stops its err^2 behavior and turns into |err|.
+One can also specify Huber's loss function, but then one also has to supply a border parameter beyond which the
+function starts its linear behavior.
+One also can set a log cosh loss function, or a quantile loss function. The latter needs a gamma parameter to be specified within the interval of 0 and 1.
+Finally, one can define a custom loss function with a callback mechanism.
+
+Note that if we use the linear versions of the robust regression, then these methods would just make simple linear
+fits or repeated median fits, which minimize their own loss function, and the selected loss function of the library
+is then only used for outlier removal.
+
+With the robust non-linear regression algorithms, the custom error functions are used for the curve fits as well 
+as for the outlier removal procedures.
+
+If one needs a linear fit where the custom error function is used as a metric for the curve fit as well as for the outlier
+removal, one has to use the non-linear algorithm with a linear call back function. 
+
+Note also that the quantile loss function is asymmetric. Therefore, the quantile loss function should mostly be used with
+the linear robust curve fitting algorithms, since then it is only used for outlier removal. 
+If the quantile loss function is used with the non-linear robust algorithms it is likely to confuse the Levenberg-Marquardt algorithm 
+because of its asymmetry.
+
+
 
 
 Note that the forward search can be very time consuming, as its performance is given by the binomial koefficient of the pointnumber over the maximum number of 
@@ -409,6 +470,8 @@ Finally, we print the result:
 > &emsp;  print(ind)
 
 
+
+
 For the interative outlier removal algorithm, a call to the regression function with default parameters (S estimator, outlier_tolerance=3, loss function as least squares, 30% of the points are outliers at maximum) would look as follows:
 
 > res=rrl.RobustRegression.nonlinear_algorithm_result()
@@ -424,6 +487,62 @@ For the interative outlier removal algorithm, a call to the regression function 
 > init.initialguess = [1,1]
 
 > rrl.RobustRegression.iterative_outlier_removal_regression_nonlinear(X2, Y2, init, ctrl, res)
+
+### Custom error functions
+By default, the library uses the sum of the squared residuals divided by the pointnumber as a loss function.
+One can also specify Huber's loss function, but then one also has to supply a border parameter beyond which the loss function starts its linear behavior.
+One also can set a log cosh loss function, or a quantile loss function. The latter needs a gamma parameter to be specified within the interval of 0 and 1.
+
+Finally, one can define a custom loss function with a callback mechanism.
+
+We may define user defined loss functions. This is done in two steps. A function
+
+> def err_pp(Y,fY,pointnumber):
+> &emsp;   return (Y-fY)*(Y-fY)/pointnumber
+
+Computes a residual between the data and the curve fit for a single point.
+Another function
+
+> def aggregate_err(errs):
+> &emsp;    res=0 
+> &emsp;   for i in range(0,len(errs)):
+> &emsp;  &emsp;     res+=errs[i]
+> &emsp;   return res
+
+computes an entire error from a list of residuals generated by the function err_pp.
+Note that if the data is such that it does not correspond perfectly to the curve, this should at best be some kind of average error instead of a simple sum.
+Since otherwise, removing a point will always reduce the error. Since the robust methods delete points based on the aggregate error, this would usually lead to
+curve fits which do not have enough points taken into consideration. The division by the pointnumber can be done in err_pp (as in this example) or in aggregate_err.
+
+The following call will then make a robust curve fit with the custom error function
+
+> res9=rrl.RobustRegression.nonlinear_algorithm_result() 
+> ctrl9=rrl.RobustRegression.modified_lts_control_nonlinear()
+> ctrl9.lossfunction=rrl.LossFunctions.custom
+> ctrl9.loss_perpoint=err_pp
+> ctrl9.aggregate_error=aggregate_err
+
+> init9=rrl.NonLinearRegression.initdata() 
+> init9.Jacobian=Jacobi
+> init9.f=linear
+> init9.initialguess = [1,1]
+> rrl.RobustRegression.modified_lts_regression_nonlinear(X2, Y2, init9, ctrl9, res9)
+
+Note that if we use the linear versions of the robust regression, then these methods would just make simple linear
+fits or repeated median fits, which minimize their own loss function, and the selected loss function of the library
+is then only used for outlier removal.
+
+With the robust non-linear regression algorithms, the custom error functions are used for the curve fits as well 
+as for the outlier removal procedures.
+
+If one needs a linear fit where the custom error function is used as a metric for the curve fit as well as for the outlier
+removal, one has to use the non-linear algorithm with a linear call back function. 
+
+Note also that the quantile loss function is asymmetric. Therefore, the quantile loss function should mostly be used with
+the linear robust curve fitting algorithms, since then it is only used for outlier removal. 
+If the quantile loss function is used with the non-linear robust algorithms it is likely to confuse the Levenberg-Marquardt algorithm 
+because of its asymmetry.
+
 
 
 
@@ -446,7 +565,7 @@ In general, one has to include the library headers as follows:
 > #include <valarray>
 
 ### Simple Linear Regression
-The usage of the library in C++ is essentially similar as in python. the testapplication.cpp demonstrates the same function calls.
+The usage of the library in C++ is essentially similar as in Python. the testapplication.cpp demonstrates the same function calls.
 The the X and Y data are stored in C++ valarrays. The control, result and initdata are not classes, but structs.
 
 For example, if we define some X,Y data:
@@ -543,7 +662,7 @@ The default parameters are as follows:
 
 The S estimator is used, outlier_tolerance=3,  30% of the pointnumber are outliers at maximum, loss function is given by least squares of the residuals.
 
-As in the python documentation, a point with residual err is then an outlier if 
+As in the Python documentation, a point with residual err is then an outlier if 
 
 > |err-median(errs)/S_estimator>3
 
@@ -581,9 +700,25 @@ The command
 
 changes the lossfunction to the absolute value. 
 
-One can also specify Huber's loss function, but then one also has to supply a border parameter delta after which the
-function stops its err^2 behavior and turns into |err|.
+One can also specify Huber's loss function, but then one also has to supply a border parameter  beyond which the function starts its linear behavior.
+One also can set a log cosh loss function, or a quantile loss function. The latter needs a gamma parameter to be specified within the interval of 0 and 1.
+Finally, one can define a custom loss function with a callback mechanism.
 
+
+Note that if we use the linear versions of the robust regression, then these methods would just make simple linear
+fits or repeated median fits, which minimize their own loss function, and the selected loss function of the library
+is then only used for outlier removal.
+
+With the robust non-linear regression algorithms, the custom error functions are used for the curve fits as well 
+as for the outlier removal procedures.
+
+If one needs a linear fit where the custom error function is used as a metric for the curve fit as well as for the outlier
+removal, one has to use the non-linear algorithm with a linear call back function. 
+
+Note also that the quantile loss function is asymmetric. Therefore, the quantile loss function should mostly be used with
+the linear robust curve fitting algorithms, since then it is only used for outlier removal. 
+If the quantile loss function is used with the non-linear robust algorithms it is likely to confuse the Levenberg-Marquardt algorithm 
+because of its asymmetry.
 
 #### Iterative outlier removal
 The modified forward search/modified lts algorithm can be slow since its complexity is given by the binomial coefficient of the pointnumber over the maximum
@@ -717,13 +852,10 @@ Then we print the result:
 > 
 >	printf("\n Indices of outliers ");
 >
->	for (size_t i = 0; i < res.indices_of_removedpoints.size(); i++)
->	{
->		size_t w = res.indices_of_removedpoints[i];
-> 
->  	printf("%lu", (unsigned long)w);
->     printf(", ");
-> 
+>	for (size_t i = 0; i < res.indices_of_removedpoints.size(); i++){
+>	&emsp;	size_t w = res.indices_of_removedpoints[i];
+>  	&emsp;	printf("%lu", (unsigned long)w);
+>   &emsp;  printf(", ");
 >	}
 
 
@@ -748,10 +880,72 @@ Then the call,
 
 The printing of the result would work similar as above.
 
+### Custom error functions
+By default, the library uses the sum of the squared residuals divided by the pointnumber as a loss function.
+One can also specify Huber's loss function, but then one also has to supply a border parameter beyond which the loss function becomes linear.
+One also can set a log cosh loss function, or a quantile loss function. The latter needs a gamma parameter to be specified within the interval of 0 and 1.
+
+Finally, one can define a custom loss function with a callback mechanism.
+
+We may define user defined loss functions. This is done in two steps. A function
+
+> double err_pp(const double Y, double fY, const size_t pointnumber) {
+> &emsp;	return ((Y - fY)* (Y - fY)) /(double) pointnumber;
+> }
+
+Computes a residual between the data and the curve fit for a single point.
+
+Another function
+
+> double aggregate_err(valarray<double>& err){
+> &emsp;	return err.sum();
+> }
+
+computes an entire error from a list of residuals generated by the function err_pp.
+Note that if the data is such that it does not correspond perfectly to the curve, this should at best be some kind of average error instead of a simple sum.
+Since otherwise, removing a point will always reduce the error. Since the robust methods delete points based on the aggregate error, this would usually lead to
+curve fits which do not have enough points taken into consideration. The division by the pointnumber can be done in err_pp (as in this example) or in aggregate_err.
+
+The following will then make a robust curve fit with the custom error function:
+At first the usual initialisation
+> Non_Linear_Regression::initdata init13;
+>	init13.f = linear;
+>	init13.J = Jacobi;
+>	init13.initialguess = beta;
+>  Robust_Regression::nonlinear_algorithm_result res13;
+
+Then the set of the custom loss function
+
+> Robust_Regression::modified_lts_control_nonlinear ctrl13;
+> ctrl13.lossfunction = LossFunctions::custom;
+> ctrl13.loss_pp = err_pp;
+> ctrl13.agg_err = aggregate_err;
+
+Note that if the aggregate error would not be defined here, the results of the calls of the loss functions per point would just be summed.
+
+Finally, we can make the function call	
+
+> Robust_Regression::modified_lts_regression_nonlinear(X2, Y2, init13, ctrl13, res13);
+
+Note that if we use the linear versions of the robust regression, then these methods would just make simple linear
+fits or repeated median fits, which minimize their own loss function, and the selected loss function of the library
+is then only used for outlier removal.
+
+With the robust non-linear regression algorithms, the custom error functions are used for the curve fits as well 
+as for the outlier removal procedures.
+
+If one needs a linear fit where the custom error function is used as a metric for the curve fit as well as for the outlier
+removal, one has to use the non-linear algorithm with a linear call back function. 
+
+Note also that the quantile loss function is asymmetric. Therefore, the quantile loss function should mostly be used with
+the linear robust curve fitting algorithms, since then it is only used for outlier removal. 
+If the quantile loss function is used with the non-linear robust algorithms it is likely to confuse the Levenberg-Marquardt algorithm 
+because of its asymmetry.
+
 # Further documentation
 The library has an online repository at https://github.com/bschulz81/robustregression where the source code can be accessed. 
 
-The detailed documentation of all the various control parameters of the curve fiting algorithms is in the docstrings of the python module and in the c++ header file. 
+The detailed documentation of all the various control parameters of the curve fiting algorithms is in the docstrings of the Python module and in the c++ header file. 
 
-Also, the C++/python test applications in the folder testapp are documented and show many function calls
+Also, the C++/Python test applications in the folder testapp are documented and show many function calls
 
