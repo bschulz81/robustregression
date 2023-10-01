@@ -103,6 +103,8 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray<double>& y,
 	Robust_Regression::nonlinear_algorithm_control& controldata, Non_Linear_Regression::initdata& init);
 
+inline bool checkdata_lossfunction(LossFunctions::errorfunction& controldata);
+
 inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y, valarray<bool>& indices,
 	Robust_Regression::result& result,
 	Robust_Regression::control& controldata);
@@ -460,8 +462,7 @@ void helperfunction_last_trimmed2(const valarray<double>& x, const valarray<doub
 
 }
 
-
-bool check_terminate_loop(size_t counter1, std::chrono::steady_clock::time_point start,
+bool check_terminate_loop(size_t counter1, std::chrono::high_resolution_clock::time_point start,
 	Robust_Regression::linear_algorithm_control* controldata_lin, 
 	Robust_Regression::nonlinear_algorithm_control* controldata_nonlin,
 	Robust_Regression::nonlinear_algorithm_result* result_nonlin,
@@ -503,7 +504,7 @@ bool check_terminate_loop(size_t counter1, std::chrono::steady_clock::time_point
 				return true;
 			}
 
-			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+			std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> elapsed_seconds = end - start;
 			long seconds = elapsed_seconds.count();
 			//after the time specified by the user has passed, stop the algorithm
@@ -518,8 +519,6 @@ bool check_terminate_loop(size_t counter1, std::chrono::steady_clock::time_point
 
 			return false;
 }
-
-
 
 inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarray<double>& y, valarray<bool>* indices, valarray<bool>* indices2,	linreg regr,
 	Robust_Regression::linear_algorithm_result* result_lin,
@@ -572,7 +571,7 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 	if ((numbercomp <= workload_in__several_threads) && (useransac == false))
 	{
 		size_t counter_false_attempts = 0;
-		std::chrono::steady_clock::time_point start  = std::chrono::high_resolution_clock::now();
+		std::chrono::high_resolution_clock::time_point start  = std::chrono::high_resolution_clock::now();
 		for (size_t i = 0; i < numbercomp; i++)
 		{
 			helperfunction_last_trimmed2(
@@ -592,7 +591,7 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 
 		bool endreached=true;
 		size_t counter_false_attempts = 0;
-		std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+		std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 		for (size_t i = 0; i < numbercomp; i++)
 		{
 			helperfunction_last_trimmed2(
@@ -608,7 +607,7 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 		if (endreached == true)
 		{
 			size_t k = (numbercomp % workload_in__several_threads) + 1;
-			std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+			std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 			for (size_t i = 0; i < k; i++)
 			{
 				helperfunction_last_trimmed2(
@@ -629,7 +628,7 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 		std::random_device rng;
 		std::mt19937 urng(rng());
 		size_t counter_false_attempts = 0;
-		std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+		std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 		do
 		{
 			helperfunction_last_trimmed2(
@@ -639,8 +638,6 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 
 		} while (!check_terminate_loop(counter_false_attempts, start, controldata_lin, controldata_nonlin, result_nonlin, result_lin));
 	}
-
-
 
 	if (result_lin != NULL)
 	{
@@ -658,9 +655,6 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 
 	}
 	return true;
-
-
-
 }
 
 
@@ -722,19 +716,36 @@ inline bool checkdata_robustmethods(const valarray<double>& x, const valarray<do
 	return true;
 }
 
+
+inline bool checkdata_lossfunction(LossFunctions::errorfunction& controldata)
+{
+	if (controldata.lossfunction == LossFunctions::huberlossfunction)
+		if (controldata.huberslossfunction_border < 0)
+			return false;
+	if (controldata.lossfunction == LossFunctions::quantile)
+		if (controldata.gamma < 0 || controldata.gamma>1) 
+			return false;
+	if (controldata.lossfunction == LossFunctions::custom)
+		if (controldata.loss_perpoint == NULL)
+			return false;
+	return true;
+}
+
+
 inline bool checkdata_linearmethods(const valarray<double>& x, const valarray<double>& y,
 	Robust_Regression::linear_algorithm_control& controldata)
 {
 	if (!checkdata_robustmethods(x, y, controldata))
 		return false;
-	if (controldata.lossfunction == LossFunctions::huberlossfunction)
-		if (controldata.huberslossfunction_border < 0)
-			return false;
+
+
 	if (controldata.rejection_method == Robust_Regression::use_peirce_criterion)
 	{
 		controldata.lossfunction = LossFunctions::squaredresidual;
 		controldata.outlier_tolerance = Statisticfunctions::peirce(x.size(), controldata.maximum_number_of_outliers, 2);
 	}
+	if (!checkdata_lossfunction(controldata))
+		return false;
 	return true;
 }
 
@@ -746,21 +757,21 @@ inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray
 	if (init.f == NULL)
 		return false;
 	if (controldata.lambda < 0)
-		controldata.lambda = 4.0;
+		return false;
 	if (controldata.increment < 0)
-		controldata.increment = 1.5;
+		return false;
 	if (controldata.decrement < 0)
-		controldata.decrement = 5;
+		return false;
 	if (controldata.precision < 0)
-		controldata.precision = 0.01;
+		return false;
 	if (controldata.h < 0)
-		controldata.h = 0.01;
+		return false;
 	if (controldata.stop_nonlinear_curve_fitting_after_iterations < 0)
-		controldata.stop_nonlinear_curve_fitting_after_iterations = 10;
+		return false;
 	if (controldata.stop_nonlinear_curve_fitting_after_seconds < 0)
-		controldata.stop_nonlinear_curve_fitting_after_seconds = 2;
+		return false;
 	if (controldata.tolerable_error < DBL_EPSILON)
-		controldata.tolerable_error = DBL_EPSILON;
+		return false;
 	if (controldata.lossfunction == LossFunctions::huberlossfunction)
 		if (controldata.huberslossfunction_border < 0)
 			return false;
@@ -769,11 +780,10 @@ inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray
 		controldata.lossfunction = LossFunctions::squaredresidual;
 		controldata.outlier_tolerance = Statisticfunctions::peirce(x.size(), controldata.maximum_number_of_outliers, init.initialguess.size());
 	}
-
+	if (!checkdata_lossfunction(controldata))
+		return false;
 	return true;
 }
-
-
 
 inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y, valarray<bool>& indices,
 	Robust_Regression::result& result,
@@ -798,7 +808,7 @@ inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y
 		}
 	}
 
-ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_regression_linear(const valarray<double>& x, const valarray<double>& y,
+ROBUSTREGRESSION_API   bool Robust_Regression::iterative_outlier_removal_regression_linear(const valarray<double>& x, const valarray<double>& y,
 	Robust_Regression::linear_algorithm_control& controldata, Robust_Regression::linear_algorithm_result& result)
 {
 
@@ -895,7 +905,8 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 
 		for (size_t i = 0; i < res.errorarray.size(); i++)
 		{
-			if ((isoutlier(res.errorarray[i], controldata.rejection_method, controldata.outlier_tolerance, estimate1, estimate2)) && indices[i] == true)
+			bool b = isoutlier(res.errorarray[i], controldata.rejection_method, controldata.outlier_tolerance, estimate1, estimate2);
+			if ((b==true) && indices[i] == true)
 				indices[i] = false;
 		}
 
@@ -908,10 +919,10 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 		*yv1 = yv2;
 	} while (true);
 
-		double mainerr = result.main_error;
-		linear_loss_function(x, y, controldata,result);
-		//restore the old error, which was computed without outliers.
-		result.main_error = mainerr;
+	double mainerr = result.main_error;
+	linear_loss_function(x, y, controldata,result);
+	//restore the old error, which was computed without outliers.
+	result.main_error = mainerr;
 
 	fill_robustdata(x, y, indices, result, controldata);
 	return true;
@@ -919,7 +930,7 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 
 
 
-ROBUSTREGRESSION_API inline bool  Robust_Regression::modified_lts_regression_linear(const valarray<double>& x, const valarray<double>& y,
+ROBUSTREGRESSION_API  bool  Robust_Regression::modified_lts_regression_linear(const valarray<double>& x, const valarray<double>& y,
 	Robust_Regression::modified_lts_control_linear& controldata,
 	Robust_Regression::linear_algorithm_result& result)
 {
@@ -961,10 +972,8 @@ ROBUSTREGRESSION_API inline bool  Robust_Regression::modified_lts_regression_lin
 	{
 		regr = &(Linear_Regression::linear_regression);
 	}
-		
-
-
 	
+
 	if (controldata.maximum_number_of_outliers <= 0)
 	{
 
@@ -984,7 +993,7 @@ ROBUSTREGRESSION_API inline bool  Robust_Regression::modified_lts_regression_lin
 
 
 
-ROBUSTREGRESSION_API inline bool Robust_Regression::modified_lts_regression_nonlinear(const valarray<double>& x, const valarray<double>& y,
+ROBUSTREGRESSION_API bool Robust_Regression::modified_lts_regression_nonlinear(const valarray<double>& x, const valarray<double>& y,
 	Non_Linear_Regression::initdata& init,
 	Robust_Regression::modified_lts_control_nonlinear&controldata,
 	Robust_Regression::nonlinear_algorithm_result& result)
@@ -1034,7 +1043,7 @@ ROBUSTREGRESSION_API inline bool Robust_Regression::modified_lts_regression_nonl
 }
 
 
-ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_regression_nonlinear(const valarray<double>& x, const valarray<double>& y,
+ROBUSTREGRESSION_API  bool Robust_Regression::iterative_outlier_removal_regression_nonlinear(const valarray<double>& x, const valarray<double>& y,
 	Non_Linear_Regression::initdata& init,
 	Robust_Regression::nonlinear_algorithm_control& ctrl,
 	Robust_Regression::nonlinear_algorithm_result& result)
@@ -1071,7 +1080,6 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 	valarray<double>* xv1 = &xv;
 	valarray<double>* yv1 = &yv;
 
-	nonlinreg regr = &(Non_Linear_Regression::non_linear_regression);
 
 	result.main_error = DBL_MAX;
 	result.beta = init.initialguess;
@@ -1081,7 +1089,7 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 			
 		Robust_Regression::nonlinear_algorithm_result res{};
 
-		regr(*xv1, *yv1, init, ctrl, res);
+		Non_Linear_Regression::non_linear_regression(*xv1, *yv1, init, ctrl, res);
 
 		Non_Linear_Regression::nonlinear_loss_function(init.f,*xv1,res.beta,*yv1, ctrl, res);
 		valarray<double> tmp = res.beta - result.beta;
@@ -1119,8 +1127,6 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 		if (counter > ctrl.stop_after_numberofiterations_without_improvement)
 			break;
 
-
-
 		double estimate1 = 0, estimate2 = 0;
 		computew1w2estimator(res.errorarray, res.errorarray.size(), estimate1, estimate2, ctrl.rejection_method);
 		for (size_t i = 0; i < res.errorarray.size(); i++)
@@ -1152,42 +1158,68 @@ ROBUSTREGRESSION_API inline  bool Robust_Regression::iterative_outlier_removal_r
 
 
 
-ROBUSTREGRESSION_API inline  double  Robust_Regression::linear_loss_function(const valarray<double>& x, const valarray<double>& y,
+ROBUSTREGRESSION_API  double  Robust_Regression::linear_loss_function(const valarray<double>& x, const valarray<double>& y,
 	LossFunctions::errorfunction& ctrl,Robust_Regression::linear_algorithm_result& err)
 {
 	size_t pointnumber = x.size();
 	err.errorarray.resize(pointnumber);
-	double error = 0;
 	err.main_error = 0;
+
 	for (size_t p = 0; p < pointnumber; p++)
 	{
-		double z = err.main_slope * x[p] + err.main_intercept - y[p];
+		double z =y[p]- (err.main_slope * x[p] + err.main_intercept);
 		switch (ctrl.lossfunction)
 		{
 		case LossFunctions::huberlossfunction:
 		{
-			error = (Statisticfunctions::fabs(z) <= ctrl.huberslossfunction_border) ? 0.5 * z * z / pointnumber : ctrl.huberslossfunction_border * (Statisticfunctions::fabs(z) - 0.5 * ctrl.huberslossfunction_border) / pointnumber;
+			double error = (Statisticfunctions::fabs(z) <= ctrl.huberslossfunction_border) ? 0.5 * z * z / pointnumber : ctrl.huberslossfunction_border * (Statisticfunctions::fabs(z) - 0.5 * ctrl.huberslossfunction_border) / pointnumber;
 			err.main_error += error;
 			err.errorarray[p] = error;
 
 			break;
 		}
-
 		case LossFunctions::squaredresidual:
 		{
-			error = z * z / pointnumber;
+			double error = z * z / (double)pointnumber;
 			err.main_error += error;
 			err.errorarray[p] = error;
 			break;
 		}
 		case LossFunctions::absolutevalue:
 		{
-			error = Statisticfunctions::fabs(z) / pointnumber;
+			double error = Statisticfunctions::fabs(z) / (double)pointnumber;
 			err.main_error += error;
 			err.errorarray[p] = error;
 			break;
 		}
+		case LossFunctions::logcosh:
+		{
+			double error = std::log(std::cosh(z)) / (double)pointnumber;
+			err.main_error += error;
+			err.errorarray[p] = error;
+			break;
+		}
+		case LossFunctions::quantile:
+		{
+			double error = z < 0.0 ? (ctrl.gamma - 1.0) * z / (double)pointnumber : ctrl.gamma * z / (double)pointnumber;
+			err.main_error += error;
+			err.errorarray[p] = error;
+			break;
+		}
+		case LossFunctions::custom:
+		{
+			err.errorarray[p] = ctrl.loss_perpoint(y[p], err.main_slope * x[p] + err.main_intercept, pointnumber);
+			if (ctrl.aggregate_err == NULL)
+				err.main_error += err.errorarray[p];
+			break;
+		}
 		}
 	}
+
+	if (ctrl.lossfunction == LossFunctions::custom && ctrl.aggregate_err != NULL)
+	{
+		err.main_error = ctrl.aggregate_err(err.errorarray);
+	}
+
 	return err.main_error;
 }
