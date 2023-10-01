@@ -39,7 +39,6 @@ namespace  Non_Linear_Regression
 	typedef function<Matrix(const valarray<double>& X, valarray<double>& beta)> Jacobian;
 
 
-
 	struct initdata
 	{
 		valarray<double> initialguess;
@@ -77,12 +76,6 @@ namespace  Non_Linear_Regression
 		}
 
 	*/
-
-
-
-
-
-
 
 	struct result
 	{
