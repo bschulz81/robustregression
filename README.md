@@ -65,7 +65,7 @@ If the variable $WITH_TESTAPP is set to ON, a c++ test application is compiled a
 The library also shipps with a Python module. By default, the CMake variable $With_Python is set to ON and a Python module will
 be generated in addition to a c++ library.
 
-If $WITH_TESTAPP and $With_Python are set, which is the default, then a Python test application will be generated in addition to
+If $WITH_TESTAPP and $WITH_PYTHON are set, which is the default, then a Python test application will be generated in addition to
 the C++ test application.
 
 ## Installing with CMake
@@ -86,17 +86,17 @@ By default, the library also containts two test applications.
 
 If the variable $WITH_TESTAPP is set, a c++ test application is compiled and put in an /output directory. 
 
-The library also ships with a Python module. By default, the CMake variable $With_Python is ON and a Python module will
+The library also ships with a Python module. By default, the CMake variable $WITH_PYTHON is ON and a Python module will
 be generated in addition to a c++ library and copied into the /output directory.
 
-If $WITH_TESTAPP and $With_Python are set to ON, which is the default, then a Python test application will be generated and compiled into the /output directory.
+If $WITH_TESTAPP and $WITH_PYTHON are set to ON, which is the default, then a Python test application will be generated and compiled into the /output directory.
 
 By compiling with CMake, the Python module is just compiled into the /output directory. It is not installed in a path for system libraries
 or python packages. So if one wants to use the Python module, one has either a) to write the script in the same folder where the module is, or b) load
 it by pointing Python to the explicit path of the module, or c) copy the module to a place where Python can find it.
 
 
-If one does not want the Python module to be compiled, one may set the cmake variable $With_Python to OFF.
+If one does not want the Python module to be compiled, one may set the cmake variable $WITH_PYTHON to OFF.
 
 ## Installing with PIP (This option is mostly for Windows since Linux distributions have their own package managers)
 
@@ -202,15 +202,15 @@ And finally, we print out the slope and intercept
 > print(res.main_intercept)
 
 ### Robust regression
-The robust regression is just slightly more complicated. Let us first add two outliers into the dats:
+The robust regression is just slightly more complicated. Let us first add two outliers into the data:
 
 > X2=[-3.0, 5.0,7.0, 10.0,13.0,15.0,16.0,20.0,22.0,25.0]
 > 
 > Y2=[ -210.0, 430.0, 590.0,830.0,1070.0,20.0,1310.0,1630.0,1790.0,-3.0]
 
 
-#### Median regression
-For linear regression, the library also has a median linear regression function, which can be called in the same way
+#### Siegel's repeated Median regression
+For linear regression, the library also has the median linear regression from Siegel, which can be called in the same way
 
 > rrl.LinearRegression.median_linear_regression(X2, Y2, res)
 
