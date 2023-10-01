@@ -28,24 +28,14 @@ SOFTWARE.
 #include "lossfunctions.h"
 #include "linearregression.h"
 #include "statisticfunctions.h"
-#ifdef GNUCOMPILER
-#define _inline inline
-#endif
-
-#ifdef CLANGCOMPILER
-#define _inline inline
-#endif
 
 
 using namespace std;
 
-ROBUSTREGRESSION_API inline  bool Linear_Regression::linear_regression(const valarray<double>& x, const valarray<double>&y, Linear_Regression::result&res)
+ROBUSTREGRESSION_API  bool Linear_Regression::linear_regression(const valarray<double>& x, const valarray<double>&y, Linear_Regression::result&res)
 {
 	
 	size_t usedpoints = x.size();
-
-
-
 	double sumy = 0;
 #pragma omp simd
 	for (size_t n = 0; n < usedpoints; n++)
@@ -53,9 +43,6 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::linear_regression(const val
 		sumy += y[n];
 	}
 	double yaverage = sumy / (double)usedpoints;
-
-
-
 	double sumx = 0, sumxy = 0, sumxx = 0;
 
 #pragma omp simd
@@ -67,9 +54,7 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::linear_regression(const val
 	}
 
 	double xaverage = sumx / (double)usedpoints;
-
 	double t = sumxx - sumx * xaverage;
-
 
 	double thisslope = (sumxy - sumx * yaverage) / t;
 	double thisintercept = yaverage - thisslope * xaverage;
@@ -81,15 +66,12 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::linear_regression(const val
 }
 
 
-ROBUSTREGRESSION_API inline  bool Linear_Regression::median_linear_regression(const valarray<double>&x,const valarray<double>&y, Linear_Regression::result&res)
+ROBUSTREGRESSION_API   bool Linear_Regression::median_linear_regression(const valarray<double>&x,const valarray<double>&y, Linear_Regression::result&res)
 
 {
 	size_t usedpoints = x.size();
 	valarray<double> stacks2(usedpoints);
 	valarray<double> stacks1(usedpoints - 1);
-
-	valarray<double> stacki1(usedpoints);
-	
 	for (size_t i = 0; i < usedpoints; i++)
 	{
 		size_t q = 0;
@@ -106,6 +88,7 @@ ROBUSTREGRESSION_API inline  bool Linear_Regression::median_linear_regression(co
 	}
 
 	double thisslope = Statisticfunctions::median(stacks2);
+	valarray<double> stacki1(usedpoints);
 	for (size_t n = 0; n < usedpoints; n++)
 	{
 		stacki1[n] =y[n] - thisslope * x[n];
