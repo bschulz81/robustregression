@@ -50,29 +50,31 @@ double H(double y, size_t nu);
 double cot(double x);
 
 
-inline  double Statisticfunctions::fabs(double f) {
+ROBUSTREGRESSION_API  double Statisticfunctions::fabs(double f) {
 	return (f < 0) ? -f : f;
 }
 
-inline  double  Statisticfunctions::factorial(size_t n)
+ROBUSTREGRESSION_API  double  Statisticfunctions::factorial(size_t n)
 {
 	double ret = 1.00;
+
 	for (size_t i = 2; i <= n; ++i)
 		ret *= (double)i;
 	return ret;
 }
 
 
-ROBUSTREGRESSION_API inline  double  Statisticfunctions::stdeviation(valarray<double>& errs)
+ROBUSTREGRESSION_API   double  Statisticfunctions::stdeviation(valarray<double>& errs)
 {
 	size_t s = errs.size();
 	double sum = 0, devi = 0, t = 0;
+#pragma omp simd
 	for (size_t i = 0; i < s; i++)
 	{
 		sum += (errs)[i];
 	}
 	double average = sum / (double)s;
-
+#pragma omp simd
 	for (size_t i = 0; i < s; i++)
 	{
 		t = ((errs)[i] - average);
@@ -84,10 +86,11 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::stdeviation(valarray<do
 }
 
 
-ROBUSTREGRESSION_API inline  double  Statisticfunctions::average(valarray<double>& errs)
+ROBUSTREGRESSION_API   double  Statisticfunctions::average(valarray<double>& errs)
 {
 	size_t s = errs.size();
 	double sum = 0, devi = 0, t = 0;
+#pragma omp simd
 	for (size_t i = 0; i < s; i++)
 	{
 		sum += (errs)[i];
@@ -96,7 +99,7 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::average(valarray<double
 }
 
 
-ROBUSTREGRESSION_API inline  double  Statisticfunctions::median(valarray<double> arr)
+ROBUSTREGRESSION_API   double  Statisticfunctions::median(valarray<double> arr)
 {
 	size_t n = arr.size();
 	if (n == 1)
@@ -125,7 +128,7 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::median(valarray<double>
 
 
 
-inline double  Statisticfunctions::lowmedian(valarray<double> arr)
+ROBUSTREGRESSION_API double  Statisticfunctions::lowmedian(valarray<double> arr)
 {
 	size_t n = arr.size();
 	size_t m = (size_t)(floor(((double)n + 1.0) / 2.0) - 1.0);
@@ -144,7 +147,7 @@ inline double cot(double x)
 	return  cos(x) / sin(x);
 }
 
-ROBUSTREGRESSION_API inline  double  Statisticfunctions::t(double alpha, size_t nu)
+ROBUSTREGRESSION_API  double  Statisticfunctions::t(double alpha, size_t nu)
 {
 	const double PI = 3.14159265358979323846;
 	if (nu % 2 != 0)
@@ -171,14 +174,14 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::t(double alpha, size_t 
 	}
 }
 
-ROBUSTREGRESSION_API inline  double   Statisticfunctions::crit(double alpha, size_t N)
+ROBUSTREGRESSION_API   double   Statisticfunctions::crit(double alpha, size_t N)
 {
 	double temp = pow(t(alpha / (2.0 * (double)N), N - 2), 2.0);
 	return ((double)N - 1.0) / sqrt((double)N) * sqrt(temp / ((double)N - 2.0 + temp));
 }
 
 
-ROBUSTREGRESSION_API inline double  Statisticfunctions::peirce(size_t pointnumber, size_t numberofoutliers, size_t fittingparameters)
+ROBUSTREGRESSION_API  double  Statisticfunctions::peirce(size_t pointnumber, size_t numberofoutliers, size_t fittingparameters)
 {
 	double diff1 = (double)(pointnumber - numberofoutliers);
 
@@ -210,7 +213,7 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::peirce(size_t pointnumbe
 
 
 
-ROBUSTREGRESSION_API inline  size_t  Statisticfunctions::binomial(size_t n, size_t k)
+ROBUSTREGRESSION_API   size_t  Statisticfunctions::binomial(size_t n, size_t k)
 {
 	if (k == 0)
 	{
@@ -235,7 +238,7 @@ ROBUSTREGRESSION_API inline  size_t  Statisticfunctions::binomial(size_t n, size
 		return(size_t)(prod2 / prod1);
 	}
 }
-ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray<double>& arr)
+ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<double>& arr)
 {
 	size_t n = arr.size();
 	std::valarray<double>helper(n);
@@ -318,7 +321,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray
 			else
 			{
 				double medA = y[i] - y[i - leftA + Amin],
-					medB = y[leftB + i] - y[i];
+					   medB = y[leftB + i] - y[i];
 				helper[i] = medA<medB? medA:medB;
 			}
 		}
@@ -355,7 +358,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray
 					else
 					{
 						double medA = y[i + tryA - Amin + 1] - y[i],
-							medB = y[i] - y[i - tryB];
+							   medB = y[i] - y[i - tryB];
 						if (medA < medB)
 						{
 							rightB = tryB;
@@ -376,7 +379,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::S_estimator(std::valarray
 			else
 			{
 				double medA = y[i + leftA - Amin + 1] - y[i],
-					medB = y[i] - y[i - leftB];
+					   medB = y[i] - y[i - leftB];
 				helper[i] = medA<medB ? medA:medB;
 			}
 		}
@@ -407,6 +410,7 @@ inline double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t
 	std::valarray<size_t> iwcand(n);
 	size_t wtotal = 0, wrest = 0, wleft, wmid, wright;
 	size_t nn = n;
+#pragma omp simd
 	for (size_t i = 0; i < nn; i++)
 	{
 		wtotal += iw[i];
@@ -458,7 +462,8 @@ inline double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t
 		else
 		{
 			size_t kcand = 0;
-			for (size_t i = 0; i < nn; i++) {
+			for (size_t i = 0; i < nn; i++) 
+			{
 				if (a[i] > trial)
 				{
 					acand[kcand] = a[i];
@@ -479,7 +484,7 @@ inline double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t
 
 
 
-ROBUSTREGRESSION_API inline double Statisticfunctions::Q_estimator(std::valarray<double>& x) {
+ROBUSTREGRESSION_API  double Statisticfunctions::Q_estimator(std::valarray<double>& x) {
 
 	size_t n = x.size();
 	double QN;
@@ -515,6 +520,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::Q_estimator(std::valarray
 		std::sort(std::begin(y), std::end(y));
 		std::valarray<double> work(n);
 		std::valarray<size_t> left(n), right(n,n), weight(n), Q(n), P(n);
+#pragma omp simd
 		for (size_t i = 0; i < n; i++)
 		{
 			left[i] = n - i + 1;
@@ -625,7 +631,7 @@ ROBUSTREGRESSION_API inline double Statisticfunctions::Q_estimator(std::valarray
 
 
 
-ROBUSTREGRESSION_API inline   double  Statisticfunctions::MAD_estimator(valarray<double>& err, double& m)
+ROBUSTREGRESSION_API    double  Statisticfunctions::MAD_estimator(valarray<double>& err, double& m)
 {
 	size_t s = err.size();
 	valarray<double>m1(s);
@@ -633,6 +639,7 @@ ROBUSTREGRESSION_API inline   double  Statisticfunctions::MAD_estimator(valarray
 	{
 		m1[i] = (Statisticfunctions::fabs((err)[i] - m));
 	}
+
 	double cn[] = { 0, 0, 1.196 ,1.495 ,1.363, 1.206, 1.200, 1.140, 1.129,1.107 };
 	double c = 1.0;
 	if (s <= 9)
@@ -649,7 +656,7 @@ ROBUSTREGRESSION_API inline   double  Statisticfunctions::MAD_estimator(valarray
 
 
 
-ROBUSTREGRESSION_API inline double  Statisticfunctions::Q1(valarray<double> m)
+ROBUSTREGRESSION_API  double  Statisticfunctions::Q1(valarray<double> m)
 {
 	size_t s = m.size();
 #if (__cplusplus == 201703L) && !defined(MACOSX)
@@ -685,7 +692,7 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q1(valarray<double> m)
 	return (Q1);
 }
 
-ROBUSTREGRESSION_API inline double  Statisticfunctions::Q3(valarray<double> m)
+ROBUSTREGRESSION_API  double  Statisticfunctions::Q3(valarray<double> m)
 {
 	size_t s = m.size();
 #if (__cplusplus == 201703L) && !defined(MACOSX)
@@ -723,7 +730,7 @@ ROBUSTREGRESSION_API inline double  Statisticfunctions::Q3(valarray<double> m)
 
 
 
-ROBUSTREGRESSION_API inline  double   Statisticfunctions::onestepbiweightmidvariance(valarray<double>& err, double& m)
+ROBUSTREGRESSION_API   double   Statisticfunctions::onestepbiweightmidvariance(valarray<double>& err, double& m)
 {
 	size_t s = err.size();
 
@@ -747,7 +754,7 @@ ROBUSTREGRESSION_API inline  double   Statisticfunctions::onestepbiweightmidvari
 }
 
 
-ROBUSTREGRESSION_API inline  double  Statisticfunctions::T_estimator(valarray<double>& err)
+ROBUSTREGRESSION_API   double  Statisticfunctions::T_estimator(valarray<double>& err)
 {
 	size_t s = err.size();
 	valarray<double>med1(s);
@@ -770,16 +777,18 @@ ROBUSTREGRESSION_API inline  double  Statisticfunctions::T_estimator(valarray<do
 	}
 
 	size_t h = s / 2 + 1;
-	double w = 0;
+	
 #if __cplusplus == 201703L && !defined(MACOSX)
 	sort(std::execution::par, std::begin(med1), std::end(med1));
 #else
 	sort(std::begin(med1), std::end(med1));
 #endif
 
-	for (size_t i = 1; i <= h; i++)
+	double w = 0;
+#pragma omp simd
+	for (size_t i = 0; i < h; i++)
 	{
-		w += med1[i - 1];
+		w += med1[i];
 	}
 
 	return  (1.38 / ((double)h)) * w;
@@ -801,7 +810,6 @@ inline double  G(double y, size_t nu)
 inline double  H(double y, size_t nu)
 {
 	double sum = 0;
-
 	for (size_t j = 1; j <= size_t((nu + 1) / 2 - 1); j++)
 	{
 		sum += factorial((size_t)j) * factorial(size_t(j - 1.0)) / (pow(4, -((double)j)) * factorial((size_t)2.0 * j)) * pow((1 + y * y / nu), -((double)j));
