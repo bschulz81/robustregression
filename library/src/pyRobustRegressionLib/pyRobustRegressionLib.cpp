@@ -737,3 +737,4 @@ PYBIND11_MODULE(pyRobustRegressionLib, m) {
 							robustregression.def("linear_loss_function", &Robust_Regression::linear_loss_function,
 								"Implements a loss function for a linear curve fit that computes the residuals "
 								"for every point given some metric (squared residuals, Huber's loss function, absolute value), and the sum of these residuals");
+}
