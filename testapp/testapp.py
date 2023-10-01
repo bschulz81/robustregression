@@ -1,3 +1,4 @@
+#!/bin/env python
 """
 Copyright(c) < 2023 > <Benjamin Schulz>
 
@@ -34,38 +35,50 @@ dir_path = os.path.dirname(file_path)
 sys.path.append(dir_path)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+# Import the robust regression library and it's submodules
 
-# Shows the sub-modules that can be imported from pyRobustRegressionLib.
-# In the following, we will. however, use the full paths.
 import pyRobustRegressionLib as rrl
-from   pyRobustRegressionLib import StatisticFunctions
-from   pyRobustRegressionLib import LinearRegression
-from   pyRobustRegressionLib import MatrixCode
-from   pyRobustRegressionLib import NonLinearRegression
-from   pyRobustRegressionLib import RobustRegression
-from   pyRobustRegressionLib import LossFunctions
+from pyRobustRegressionLib import StatisticFunctions
+from pyRobustRegressionLib import LinearRegression
+from pyRobustRegressionLib import MatrixCode 
+from pyRobustRegressionLib import LossFunctions
+from pyRobustRegressionLib import NonLinearRegression
+from pyRobustRegressionLib import RobustRegression
 
 print("\nPrint the description of the sub-modules of pyRobustRegressionLib\n\n")
 print(print(rrl.__doc__))
 
 
 ##callback functions that will be given to the c library.
-##a fitting function f(X,beta), with X as Data and beta as parameters to be found
-def linear(X, beta):
+##a fitting function f(X,beta)=beta[0]*X+beta[1], with X as Data and beta as parameters to be found
+def linear(X:list, beta:list)->list:
     Y=[]
     for i in range(0,len(X)):
         Y.append(beta[0] * X[i] + beta[1])
     return Y
 
 ## The  Jacobi matrix J(X,beta) of the linear function above
-def Jacobi(X, beta):
+def Jacobi(X:list, beta)->rrl.MatrixCode.Matrix:
 	m=rrl.MatrixCode.Matrix (len(X), len(beta))
 	for i in range(0,len(X)):
 		m[i, 0] = X[i]
-		m[i, 1] = 1
+		m[i, 1] = 1.0
 	return m
 
 
+
+#custom error function per point. Here the square of the residuals is chosen.
+#the residuals are scaled by the pointnumber, in order to avoid that a smaller pointnumber always yields a smaller total error.
+
+def err_pp(Y:float,fY:float,pointnumber:int)->float:
+    return ((Y-fY)*(Y-fY))/ float(pointnumber)
+#computes the entire error for all points
+#           
+def aggregate_err(errs:list)->float:
+    res=0.0 
+    for i in range(0,len(errs)):
+        res+=errs[i]
+    return res
 
 
 print("\n\n Now we run some very simple tests.\n\n")
@@ -183,7 +196,7 @@ X2a.Printvector()
 Y2a.Printvector()
 
 
-print("\nLinear Regression")
+print("\nSimple Linear Regression")
 res2=rrl.LinearRegression.result()
 rrl.LinearRegression.linear_regression(X2, Y2, res2)
 print("Slope") 
@@ -191,7 +204,7 @@ print(res2.main_slope)
 print("Intercept") 
 print(res2.main_intercept)
 
-print("\n\nMedian Linear Regression")
+print("\n\nSiegel's repeated Median Linear Regression")
 res3=rrl.LinearRegression.result()
 rrl.LinearRegression.median_linear_regression(X2, Y2, res3)
 print("Slope") 
@@ -242,7 +255,8 @@ for ind in res4.indices_of_removedpoints:
 
 
 
-print("\n\n\nIterative outlier removal")
+print("\n\n\nIterative outlier with the linear algorithms removal")
+
 ctrl5= rrl.RobustRegression.linear_algorithm_control()
 res5= rrl.RobustRegression.linear_algorithm_result()
 rrl.RobustRegression.iterative_outlier_removal_regression_linear(X2, Y2, ctrl5, res5)
@@ -300,7 +314,6 @@ print(res6a.beta[1])
 print("\n\n\nRobust non-linear regression with the same 2 inserted outliers\n")
 
 print("\nIterative outlier removal \n")
-
 res7=rrl.RobustRegression.nonlinear_algorithm_result() 
 ctrl7=rrl.RobustRegression.nonlinear_algorithm_control()
 init7=rrl.NonLinearRegression.initdata() 
@@ -313,7 +326,6 @@ print("Slope")
 print(res7.beta[0])
 print("Intercept") 
 print(res7.beta[1])
-
 
 print("\nOutlier indices")
 for ind in res7.indices_of_removedpoints:
@@ -340,3 +352,25 @@ print("\nOutlier indices")
 for ind in res8.indices_of_removedpoints:
     print(ind)
 
+
+print("\n\nModified last trimmed squares with a custom error function\n")
+res9=rrl.RobustRegression.nonlinear_algorithm_result() 
+ctrl9=rrl.RobustRegression.modified_lts_control_nonlinear()
+ctrl9.lossfunction=rrl.LossFunctions.custom
+ctrl9.loss_perpoint=err_pp
+ctrl9.aggregate_err=aggregate_err
+
+init9=rrl.NonLinearRegression.initdata() 
+init9.Jacobian=Jacobi
+init9.f=linear
+init9.initialguess = [1,1]
+rrl.RobustRegression.modified_lts_regression_nonlinear(X2, Y2, init9, ctrl9, res9)
+
+print("Slope")
+print(res9.beta[0])
+print("Intercept") 
+print(res9.beta[1])
+
+print("\nOutlier indices")
+for ind in res9.indices_of_removedpoints:
+    print(ind)
