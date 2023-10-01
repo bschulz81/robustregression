@@ -29,16 +29,24 @@ SOFTWARE.
 #include "lossfunctions.h"
 #include "nonlinearregression.h"
 
+#ifdef GNUCOMPILER
+#define _inline inline
+#endif
+
+#ifdef CLANGCOMPILER
+#define _inline inline
+#endif
 
 valarray<double> directionalderivative(Non_Linear_Regression::fun f, const valarray<double>& X, valarray<double>& fxbeta, valarray<double>& beta, valarray<double>& delta, Matrix & J, double h);
 
 
 inline valarray<double> directionalderivative(Non_Linear_Regression::fun f, const valarray<double>& X, valarray<double>& fxbeta, valarray<double>& beta, valarray<double>& delta, Matrix& J, double h)
 {
-	return  ((f(X, (beta + (delta * h))) - fxbeta) / h - J * delta) * 2 / h;
+	valarray<double> tmp = beta + (delta * h);
+	return  ((f(X, tmp) - fxbeta) / h - J * delta) * 2 / h;
 }
 
-ROBUSTREGRESSION_API inline bool Non_Linear_Regression::non_linear_regression(const valarray<double>& x,const valarray<double>& y,
+ROBUSTREGRESSION_API bool Non_Linear_Regression::non_linear_regression(const valarray<double>& x,const valarray<double>& y,
 	 Non_Linear_Regression::initdata &init,
 	Non_Linear_Regression::control &control,
 	Non_Linear_Regression::result& res)
@@ -85,7 +93,7 @@ ROBUSTREGRESSION_API inline bool Non_Linear_Regression::non_linear_regression(co
 
 		valarray<double> fxbeta = init.f(x, beta);
 
-		valarray<double>  v = Jt * (y - fxbeta);
+		valarray<double>  v = (valarray<double>)(Jt *(Vector) (y - fxbeta));
 
 		Matrix G = Jt * J;
 
@@ -199,12 +207,11 @@ ROBUSTREGRESSION_API inline bool Non_Linear_Regression::non_linear_regression(co
 	return true;
 }
 
-ROBUSTREGRESSION_API inline double Non_Linear_Regression::nonlinear_loss_function(fun f, const valarray<double>& X, valarray<double>& beta, const valarray<double>& Y,
+ROBUSTREGRESSION_API double Non_Linear_Regression::nonlinear_loss_function(fun f, const valarray<double>& X, valarray<double>& beta, const valarray<double>& Y,
 	Non_Linear_Regression::control& ctrl, LossFunctions::error& res)
 {
-	valarray<double> tmp= (valarray<double>) f(X, beta) - Y;
-
-	valarray<double> tmp2(tmp.size());
+	valarray<double> Ypred = (valarray<double>) f(X, beta);
+	valarray<double> tmp=Y-Ypred;
 	res.main_error = 0;
 	res.errorarray.resize(tmp.size());
 	switch (ctrl.lossfunction)
@@ -214,9 +221,9 @@ ROBUSTREGRESSION_API inline double Non_Linear_Regression::nonlinear_loss_functio
 		for (size_t i = 0; i < tmp.size(); i++)
 		{
 			double a = Statisticfunctions::fabs(tmp[i]);
-			tmp2[i] = (a <= ctrl.huberslossfunction_border) ? 0.5 * a * a / tmp.size() : ctrl.huberslossfunction_border * (a - 0.5 * ctrl.huberslossfunction_border) / tmp.size();
-			res.main_error += tmp2[i];
-			res.errorarray[i] = tmp2[i];
+			double tmp2 = (a <= ctrl.huberslossfunction_border) ? 0.5 * a * a / tmp.size() : ctrl.huberslossfunction_border * (a - 0.5 * ctrl.huberslossfunction_border) / tmp.size();
+			res.main_error += tmp2;
+			res.errorarray[i] = tmp2;
 		}
 		break;
 	}
@@ -224,9 +231,9 @@ ROBUSTREGRESSION_API inline double Non_Linear_Regression::nonlinear_loss_functio
 	{
 		for (size_t i = 0; i < tmp.size(); i++)
 		{
-			tmp2[i] = tmp[i] * tmp[i] / tmp.size();
-			res.main_error += tmp2[i];
-			res.errorarray[i] = tmp2[i];
+			double tmp2 = tmp[i] * tmp[i] / tmp.size();
+			res.main_error += tmp2;
+			res.errorarray[i] = tmp2;
 		}
 		break;
 	}
@@ -234,14 +241,45 @@ ROBUSTREGRESSION_API inline double Non_Linear_Regression::nonlinear_loss_functio
 	{
 		for (size_t i = 0; i < tmp.size(); i++)
 		{
-			tmp2[i] = Statisticfunctions::fabs(tmp[i]) / tmp.size();
-			res.main_error += tmp2[i];
-		    res.errorarray[i] = tmp2[i];
+			double tmp2 = Statisticfunctions::fabs(tmp[i]) / tmp.size();
+			res.main_error += tmp2;
+			res.errorarray[i] = tmp2;
 		}
 		break;
 	}
-
+	case LossFunctions::logcosh:
+	{
+		for (size_t i = 0; i < tmp.size(); i++)
+		{
+			double tmp2 = std::log(std::cosh(tmp[i]))/tmp.size();
+			res.main_error += tmp2;
+			res.errorarray[i] = tmp2;
+		}
+		break;
+	}
+	case LossFunctions::quantile:
+	{
+		for (size_t i = 0; i < tmp.size(); i++)
+		{
+			double tmp2 = tmp[i] <0.0 ? (ctrl.gamma - 1.0) * tmp[i] / (double)tmp.size() : ctrl.gamma * tmp[i] / (double)tmp.size();
+			res.main_error += tmp2;
+			res.errorarray[i] = tmp2;
+		}
+		break;
+	}
+	case LossFunctions::custom:
+		for (size_t i = 0; i < tmp.size(); i++)
+		{
+			res.errorarray[i] = ctrl.loss_perpoint(Y[i], Ypred[i],tmp.size());
+			if (ctrl.aggregate_err == NULL)
+				res.main_error += res.errorarray[i];
+		}
+		if (ctrl.aggregate_err != NULL)
+		{
+			res.main_error = ctrl.aggregate_err(res.errorarray);
+		}
+		break;
 	}
 	return res.main_error;
 
-	}
+}
