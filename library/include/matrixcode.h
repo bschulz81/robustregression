@@ -37,26 +37,26 @@ class ROBUSTREGRESSION_API Vector
 {
 public:
 	  // initializes a vector with size s and all elements set to 0.0 
-	  Vector(const size_t s);
+	   Vector(const size_t s);
 	  //initializes a vector with the elements of a valarray. vector(i)=v[i].
-	  Vector(valarray<double> v);
-	  Vector(valarray<double> *v);
+	   Vector(valarray<double> v);
+	   Vector(valarray<double> *v);
 
 	  //operators for typical vector calculations
-	  Vector operator+(const Vector&)const;
-	  Vector operator-(const Vector&)const;
-	  double operator*(const Vector&)const;
-	  Vector operator*(const double&)const;
-	  Vector operator/(const double&)const;
-	  double& operator()(const size_t);
-	  const double& operator()(const size_t)const;
-	  inline operator valarray<double>() const { return m; }
-	  Vector operator=( Vector&);
-	  Vector operator=( Vector*); 
+	   Vector operator+(const Vector&)const;
+	   Vector operator-(const Vector&)const;
+	   double operator*(const Vector&)const;
+	   Vector operator*(const double&)const;
+	   Vector operator/(const double&)const;
+	   double& operator()(const size_t);
+	   const double& operator()(const size_t)const;
+	   operator valarray<double>() const { return m; }
+	   Vector operator=( Vector&);
+	   Vector operator=( Vector*); 
 	  //returns the size of a vector
-	  size_t Size() const;
+	   size_t Size() const;
 	  //resizes the vector and sets its size to 0.
-	  void Resize(const size_t t);
+	   void Resize(const size_t t);
 private:
 	  valarray<double> m;
 };
@@ -67,32 +67,32 @@ class ROBUSTREGRESSION_API Matrix
 {
 public:
 	// initializes a matrix with given rows and columns and values zero.
-	  Matrix(const size_t rows, const size_t columns);
-	  //initializes a matrix with given rows and columns and fills it with the values of a given array, 
+	   Matrix(const size_t rows, const size_t columns);
+	  // initializes a matrix with given rows and columns and fills it with the values of a given array, 
 	  // the value of Matrix(row,column) should be given by m1[row * columns + column]
-	  Matrix(const size_t rows, const size_t columns, valarray<double> m1);
-	  Matrix(const size_t rows, const size_t columns, valarray<double> *m1);
+	   Matrix(const size_t rows, const size_t columns, valarray<double> m1);
+	   Matrix(const size_t rows, const size_t columns, valarray<double> *m1);
 
 	  //common operators vor matrix calculations
-	  Matrix operator+(const Matrix&)const;
-	  Matrix operator-(const Matrix&)const;
-	  Matrix operator*(const Matrix&)const;
-	  Vector operator*(const Vector&)const;
-	  valarray<double> Matrix::operator*(const valarray<double>& B)const;
-	  Matrix operator*(const double&)const;
-	  Matrix operator/(const double&)const;
-	  double& operator()( const size_t row, const  size_t column) ;
-	  const double& operator()(const size_t row, const  size_t column)const;
-	  inline operator valarray<double>() const {  return m;  }
+	   Matrix operator+(const Matrix&)const;
+	   Matrix operator-(const Matrix&)const;
+	   Matrix operator*(const Matrix&)const;
+	   Vector operator*(const Vector&)const;
+	   valarray<double> operator*(const valarray<double>& B)const;
+	   Matrix operator*(const double&)const;
+	   Matrix operator/(const double&)const;
+	   double& operator()( const size_t row, const  size_t column) ;
+	   const double& operator()(const size_t row, const  size_t column)const;
+	   operator valarray<double>() const {  return m;  }
 
 	  // returns the number of rows
-	  size_t Rows() const;
+	   size_t Rows() const;
 	  //returns the number of columns
-	  size_t Columns() const;
+	   size_t Columns() const;
 	  //resizes a matrix and sets its values to zero
-	  void Resize(const size_t rows, const size_t columns);
+	   void Resize(const size_t rows, const size_t columns);
 	  //interchanges rows of a matrix.
-	  void SwapRows(const size_t row1, const size_t row2);
+	   void SwapRows(const size_t row1, const size_t row2);
 private:
 	size_t r;
 	size_t c;
