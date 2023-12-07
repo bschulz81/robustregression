@@ -554,7 +554,7 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 	bool useransac;
 	size_t workload_in__several_threads;
 
-	//check if the supplied stop_after_numberofiterations_without_improvement was too small and set the error to max.
+	//set the error to max.
 	if (controldata_lin != NULL)
 	{
 		result_lin->main_error = DBL_MAX;
