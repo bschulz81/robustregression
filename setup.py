@@ -30,7 +30,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
 name="pyRobustRegressionLib",
-version="1.3.0",
+version="1.3.1",
 description="A library that implements algorithms for linear and non-linear robust regression.",
 long_description=long_description,
 long_description_content_type='text/markdown',
