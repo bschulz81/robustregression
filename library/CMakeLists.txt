@@ -50,7 +50,7 @@ GENERATE_EXPORT_HEADER(RobustRegressionLib
 if(${WITH_PYTHON})
     set (librarypythondir ${librarysourcedir}/pyRobustRegressionLib)
     find_package(Python3 COMPONENTS Interpreter Development)  
-    find_package(pybind11 CONFIG REQUIRED )
+    find_package(pybind11 REQUIRED HINTS "${Python3_SITELIB}")
 
     set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_DEBUG ";RELEASE")
 
