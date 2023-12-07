@@ -1,8 +1,10 @@
 1.3.1
+
 Included a fix that ensures pybind11 is found
 
 
 1.3.0
+
 The library now compiles sucessfully under linux
 
 The test applications can be run under linux
