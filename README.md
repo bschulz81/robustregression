@@ -562,7 +562,6 @@ In general, one has to include the library headers as follows:
 >
 > #include "lossfunctions.h" 
 >
-> #include <valarray>
 
 ### Simple Linear Regression
 The usage of the library in C++ is essentially similar as in Python. the testapplication.cpp demonstrates the same function calls.
