@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.5)
 
 project ("RobustRegressionLib")
-project(RobustRegressionLib VERSION 1.3.0 DESCRIPTION "Library with functions for robust regression and a testapp")
+project(RobustRegressionLib VERSION 1.3.2 DESCRIPTION "Library with functions for robust regression and a testapp")
 
 option(WITH_PYTHON "set this to generate python bindings" ON)
 option(WITH_TESTAPP "set this to generate the testapplications" ON)
