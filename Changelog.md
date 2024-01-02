@@ -1,3 +1,8 @@
+1.3.2
+Fixed a bug in /library/src/robustregression.cpp in the functions iterative_outlier_removal_regression_linear and iterative_outlier_removal_regression_nonlinear that could cause segmentation faults with some implementations of the c++ standard library 
+
+Removed unnecessary computations in the S and Q estimator in /library/src/statisticfunctions
+
 1.3.1
 
 Included a fix that ensures pybind11 is found
