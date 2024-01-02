@@ -89,7 +89,7 @@ ROBUSTREGRESSION_API   double  Statisticfunctions::stdeviation(valarray<double>&
 ROBUSTREGRESSION_API   double  Statisticfunctions::average(valarray<double>& errs)
 {
 	size_t s = errs.size();
-	double sum = 0, devi = 0, t = 0;
+	double sum = 0;
 #pragma omp simd
 	for (size_t i = 0; i < s; i++)
 	{
@@ -275,7 +275,6 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 				leftA = 1,
 				leftB = 1,
 				rightA = nB,
-				rightB = nB,
 				Amin = diff2,
 				Amax = diff2 + i;
 			while (leftA < rightA)
@@ -295,10 +294,9 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 					else
 					{
 						double medA = y[i] - y[i - tryA + Amin],
-							medB = y[tryB + i] - y[i];
+						medB = y[tryB + i] - y[i];
 						if (medA < medB)
 						{
-							rightB = tryB;
 							leftA = tryA + even;
 						}
 						else
@@ -310,7 +308,7 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 				}
 				else
 				{
-					rightB = tryB;
+
 					leftA = tryA + even;
 				}
 			}
@@ -333,7 +331,7 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 				leftA = 1,
 				leftB = 1,
 				rightA = i,
-				rightB = i,
+
 				Amin = diff2 + 1,
 				Amax = diff2 + nA;
 			while (leftA < rightA)
@@ -345,7 +343,6 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 					tryB = leftB + half;
 				if (tryA < Amin)
 				{
-					rightB = tryB;
 					leftA = tryA + even;
 				}
 				else
@@ -361,7 +358,7 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 							   medB = y[i] - y[i - tryB];
 						if (medA < medB)
 						{
-							rightB = tryB;
+
 							leftA = tryA + even;
 						}
 						else
@@ -408,7 +405,7 @@ ROBUSTREGRESSION_API  double Statisticfunctions::S_estimator(std::valarray<doubl
 inline double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t n) {
 	std::valarray<double> acand(n);
 	std::valarray<size_t> iwcand(n);
-	size_t wtotal = 0, wrest = 0, wleft, wmid, wright;
+	size_t wtotal = 0, wrest = 0, wleft, wmid;
 	size_t nn = n;
 #pragma omp simd
 	for (size_t i = 0; i < nn; i++)
@@ -424,18 +421,14 @@ inline double whimed(std::valarray<double>& a, std::valarray<size_t>& iw, size_t
 
 		wleft = 0;
 		wmid = 0;
-		wright = 0;
+
 		for (size_t i = 0; i < nn; i++)
 		{
 			if (a[i] < trial)
 			{
 				wleft += iw[i];
 			}
-			else if (a[i] > trial)
-			{
-				wright += iw[i];
-			}
-			else
+			else if(a[i] == trial)
 			{
 				wmid += iw[i];
 			}
