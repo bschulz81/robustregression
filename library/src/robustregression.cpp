@@ -76,7 +76,7 @@ typedef bool(*nonlinreg)(const valarray<double>& X, const valarray<double>& Y, N
 
 inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_method, double tolerance, double average_or_median, double estimators);
 
-inline void computew1w2estimator(valarray<double>& err, size_t pointnumber, double& est1, double& est2, Robust_Regression::estimator_name estimator_name);
+inline void computew1w2estimator(valarray<double>& err, double& est1, double& est2, Robust_Regression::estimator_name estimator_name);
 
 inline void helperfunction_findmodel(valarray<double>& err, valarray<bool>* usedpoint,  Robust_Regression::control& ctrl);
 
@@ -105,9 +105,8 @@ inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray
 
 inline bool checkdata_lossfunction(LossFunctions::errorfunction& controldata);
 
-inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y, valarray<bool>& indices,
-	Robust_Regression::result& result,
-	Robust_Regression::control& controldata);
+inline void fill_robustdata(valarray<bool>& indices,
+	Robust_Regression::result& result);
 
 
 
@@ -154,10 +153,14 @@ inline bool isoutlier(double err, Robust_Regression::estimator_name rejection_me
 }
 
 
-inline void computew1w2estimator(valarray<double>& err, size_t pointnumber,double & w1,double& w2, Robust_Regression::estimator_name estimator_name)
+inline void computew1w2estimator(valarray<double>& err,double & w1,double& w2, Robust_Regression::estimator_name estimator_name)
 {
 	switch (estimator_name)
 	{
+	case Robust_Regression::no_rejection:
+	{
+		//falls through
+	}
 	case Robust_Regression::tolerance_is_maximum_error:
 	{
 		break;
@@ -234,7 +237,7 @@ inline void helperfunction_findmodel(valarray<double>&err, valarray<bool>* usedp
 	if (mp.size() > 0)
 	{
 		double estimate1 = 0, estimate2 = 0;
-		computew1w2estimator(err, pointnumber, estimate1, estimate2, ctrl.rejection_method);
+		computew1w2estimator(err, estimate1, estimate2, ctrl.rejection_method);
 
 		for (size_t j = 0; j < mp.size(); j++)
 		{
@@ -253,10 +256,8 @@ inline void findmodel_linear(const valarray<double>& x, const valarray<double>& 
 	linreg regr,  Robust_Regression::linear_algorithm_control&ctrl)
 {
 
-	size_t pointnumber = x.size();
 	valarray<double> x1 = x[*usedpoint];
 	valarray<double> y1 = y[*usedpoint];
-
 
 	Robust_Regression::linear_algorithm_result res{};
 
@@ -274,7 +275,6 @@ inline bool findmodel_non_linear(const valarray<double>& x, const valarray<doubl
 	nonlinreg regr, Non_Linear_Regression::initdata &init, Robust_Regression::nonlinear_algorithm_control& ctrl)
 {
 	//makes a fit with the initial usedpoint array as a mask
-	size_t pointnumber = x.size();
 	valarray<double> x1 = x[*usedpoint];
 	valarray<double> y1 = y[*usedpoint];
 
@@ -587,7 +587,6 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 	else if ((numbercomp > workload_in__several_threads) && (useransac==false))
 	{
 
-		size_t p = (size_t)numbercomp / workload_in__several_threads;
 
 		bool endreached=true;
 		size_t counter_false_attempts = 0;
@@ -617,7 +616,6 @@ inline bool helperfunction_least_trimmed(const valarray<double>& x, const valarr
 
 				if (check_terminate_loop(counter_false_attempts, start, controldata_lin, controldata_nonlin, result_nonlin, result_lin))
 				{
-					endreached = false;
 					break;
 				}
 			}
@@ -785,9 +783,8 @@ inline bool checkdata_nonlinearmethods(const valarray<double>& x, const valarray
 	return true;
 }
 
-inline void fill_robustdata(const valarray<double>& x, const valarray<double>& y, valarray<bool>& indices,
-	Robust_Regression::result& result,
-	Robust_Regression::control& controldata) 
+inline void fill_robustdata(valarray<bool>& indices,
+	Robust_Regression::result& result)
 {
 	size_t pointnumber = indices.size();
 
@@ -832,7 +829,7 @@ ROBUSTREGRESSION_API   bool Robust_Regression::iterative_outlier_removal_regress
 		}
 
 		linear_loss_function(x, y, controldata,result);
-		fill_robustdata(x, y, indices, result, controldata);
+		fill_robustdata( indices, result);
 		return true;
 	}
 
@@ -848,7 +845,7 @@ ROBUSTREGRESSION_API   bool Robust_Regression::iterative_outlier_removal_regress
 
 	valarray<double>* xv1 = &xv;
 	valarray<double>* yv1 = &yv;
-
+	valarray<double> temperrs;
 	linreg regr;
 	if (controldata.use_median_regression)
 	{
@@ -901,7 +898,7 @@ ROBUSTREGRESSION_API   bool Robust_Regression::iterative_outlier_removal_regress
 
 		double estimate1 = 0, estimate2 = 0;
 
-		computew1w2estimator(res.errorarray, res.errorarray.size(), estimate1, estimate2, controldata.rejection_method);
+		computew1w2estimator(res.errorarray, estimate1, estimate2, controldata.rejection_method);
 
 		for (size_t i = 0; i < res.errorarray.size(); i++)
 		{
@@ -914,7 +911,8 @@ ROBUSTREGRESSION_API   bool Robust_Regression::iterative_outlier_removal_regress
 
 		valarray<double>xv2 = (*xv1)[indices];
 		valarray<double>yv2 = (*yv1)[indices];
-		res.errorarray = res.errorarray[indices];
+		temperrs=res.errorarray[indices];
+		res.errorarray = temperrs;
 		*xv1 = xv2;
 		*yv1 = yv2;
 	} while (true);
@@ -924,7 +922,7 @@ ROBUSTREGRESSION_API   bool Robust_Regression::iterative_outlier_removal_regress
 	//restore the old error, which was computed without outliers.
 	result.main_error = mainerr;
 
-	fill_robustdata(x, y, indices, result, controldata);
+	fill_robustdata(indices, result);
 	return true;
 }
 
@@ -979,14 +977,14 @@ ROBUSTREGRESSION_API  bool  Robust_Regression::modified_lts_regression_linear(co
 
 		regr(x, y, result);
 		linear_loss_function(x, y, controldata, result);
-		fill_robustdata(x, y, indices, result, controldata);
+		fill_robustdata( indices, result);
 		return true;
 	}
 	else
 	{
 
 		helperfunction_least_trimmed(x, y, &indices, &indices2, regr, &result, &controldata, NULL, NULL, NULL, NULL);
-		fill_robustdata(x, y, indices2, result, controldata);
+		fill_robustdata( indices2, result);
 		return true;
 	}
 }
@@ -1030,14 +1028,14 @@ ROBUSTREGRESSION_API bool Robust_Regression::modified_lts_regression_nonlinear(c
 	{
 		if (regr(x, y, init, controldata, result) == false)
 			return false;
-		Non_Linear_Regression:nonlinear_loss_function(init.f, x, result.beta, y,controldata, result);
-		fill_robustdata(x, y,indices, result, controldata);
+		Non_Linear_Regression::nonlinear_loss_function(init.f, x, result.beta, y,controldata, result);
+		fill_robustdata(indices, result);
 		return true;
 	}
 	else
 	{
 		helperfunction_least_trimmed(x, y, &indices, &indices2,NULL,NULL,NULL,regr,&init, &controldata,&result);
-		fill_robustdata(x, y, indices2, result, controldata);
+		fill_robustdata( indices2, result);
 		return true;
 	}
 }
@@ -1060,7 +1058,7 @@ ROBUSTREGRESSION_API  bool Robust_Regression::iterative_outlier_removal_regressi
 		if (Non_Linear_Regression::non_linear_regression(x, y, init, ctrl, result))
 		{
 			Non_Linear_Regression::nonlinear_loss_function(init.f, x, result.beta, y, ctrl, result);
-			fill_robustdata(x, y, indices, result, ctrl);
+			fill_robustdata( indices, result);
 			return true;
 		}
 		else
@@ -1079,7 +1077,7 @@ ROBUSTREGRESSION_API  bool Robust_Regression::iterative_outlier_removal_regressi
 
 	valarray<double>* xv1 = &xv;
 	valarray<double>* yv1 = &yv;
-
+	valarray<double> tmperrs;
 
 	result.main_error = DBL_MAX;
 	result.beta = init.initialguess;
@@ -1128,7 +1126,7 @@ ROBUSTREGRESSION_API  bool Robust_Regression::iterative_outlier_removal_regressi
 			break;
 
 		double estimate1 = 0, estimate2 = 0;
-		computew1w2estimator(res.errorarray, res.errorarray.size(), estimate1, estimate2, ctrl.rejection_method);
+		computew1w2estimator(res.errorarray, estimate1, estimate2, ctrl.rejection_method);
 		for (size_t i = 0; i < res.errorarray.size(); i++)
 		{
 			if ((isoutlier(res.errorarray[i], ctrl.rejection_method, ctrl.outlier_tolerance, estimate1, estimate2)) && (indices[i] == true))
@@ -1139,7 +1137,8 @@ ROBUSTREGRESSION_API  bool Robust_Regression::iterative_outlier_removal_regressi
 
 		valarray<double>xv2 = (*xv1)[indices];
 		valarray<double>yv2 = (*yv1)[indices];
-		res.errorarray = res.errorarray[indices];
+		tmperrs=res.errorarray[indices];
+		res.errorarray = tmperrs;
 		*xv1 = xv2;
 		*yv1 = yv2;
 	} while (true);
@@ -1150,7 +1149,7 @@ ROBUSTREGRESSION_API  bool Robust_Regression::iterative_outlier_removal_regressi
 		//restore the old error, which was computed without outliers.
 	result.main_error = mainerr;
 
-	fill_robustdata(x, y, indices, result, ctrl);
+	fill_robustdata( indices, result);
 
 	return true;
 }
