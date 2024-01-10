@@ -109,11 +109,10 @@ in the package directory.
 
 After that, the module is compiled and the binaries are copied into a path for Python site-packages, where Python scripts should be able to find it.
 
-This is successfull on Windows.
+Note that the binary code which is installed by pip is compiled with python 3.12. If your default python interpreter has a different version, the module will not load, unless you use a python 3.12 interpreter.
+If you do not have a python 3.12 interpreter, pip can attempt to compile the module if a c++ compiler, cmake and pybind11 is found on the system.
 
-Unfortunately, problems to find the module remain on Linux.
-If pip is called by the  root user, the module is copied into the /usr/lib directory. Despite this,  python scripts have difficulties to load the module if they do not use a hardcoded import path. 
-If one does not install the module as root user, pip will install it in a local site-package directory, where python also has problems to find the module without a hard coded import path.
+The preferred way, especially under linux, is to compile the library with CMake.
 
 If the module was compiled by pip, one can uninstall it by typing
 
